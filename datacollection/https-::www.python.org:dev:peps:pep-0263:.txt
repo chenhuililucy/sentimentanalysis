@@ -1,0 +1,43 @@
+
+
+
+UTF-8 is a variable width character encoding capable of encoding all 1,112,064 valid code points in Unicodeusing one to four 8-bit bytes. The encoding is defined by the Unicode Standard, and was originally designed by Ken Thompson and Rob Pike. The name is derived from Unicode (or Universal Coded Character Set) Transformation Format – 8-bit.
+
+
+
+
+					——————————————
+
+
+This PEP proposes to introduce a syntax to declare the encoding of a Python source file. The encoding information is then used by the Python parser to interpret the file using the given encoding. Most notably this enhances the interpretation of Unicode literals in the source code and makes it possible to write Unicode literals using e.g. UTF-8 directly in an Unicode aware editor.
+
+In Python 2.1, Unicode literals can only be written using the Latin-1 based encoding "unicode-escape". This makes the programming environment rather unfriendly to Python users who live and work in non-Latin-1 locales such as many of the Asian countries. Programmers can write their 8-bit strings using the favorite encoding, but are bound to the "unicode-escape" encoding for Unicode literals.
+
+I propose to make the Python source code encoding both visible and changeable on a per-source file basis by using a special comment at the top of the file to declare the encoding.
+
+To make Python aware of this encoding declaration a number of concept changes are necessary with respect to the handling of Python source code data.
+
+Python will default to ASCII as standard encoding if no other encoding hints are given.
+
+To define a source code encoding, a magic comment must be placed into the source files either as first or second line in the file, such as:
+
+# coding=<encoding name>
+
+
+or (using formats recognized by popular editors):
+
+#!/usr/bin/python
+# -*- coding: <encoding name> -*-
+or:
+
+#!/usr/bin/python
+# vim: set fileencoding=<encoding name> :
+More precisely, the first or second line must match the following regular expression:
+
+^[ \t\f]*#.*?coding[:=][ \t]*([-_.a-zA-Z0-9]+)
+The first group of this expression is then interpreted as encoding name. If the encoding is unknown to Python, an error is raised during compilation. There must not be any Python statement on the line that contains the encoding declaration. If the first line matches the second line is ignored.
+
+To aid with platforms such as Windows, which add Unicode BOM marks to the beginning of Unicode files, the UTF-8 signature \xef\xbb\xbf will be interpreted as 'utf-8' encoding as well (even if no magic encoding comment is given).
+
+If a source file uses both the UTF-8 BOM mark signature and a magic encoding comment, the only allowed encoding for the comment is 'utf-8'. Any other encoding will cause an error.
+
