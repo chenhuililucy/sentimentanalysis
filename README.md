@@ -1,7 +1,7 @@
 # sentimentanalysis
 experimental codes for a summer research project 
 
-This is just to clarify that not all of the codes here are 100% my own. Some of them are codes I've modified based on online codes. 
+This is just to clarify that not all of the codes here are 100% my own. Some of them are codes I've modified based on online codes. The composition of files here is 30% reference codes annotated: 70% my own codes
 				
 	
 			----------------------------------
