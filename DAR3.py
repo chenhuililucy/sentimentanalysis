@@ -9,7 +9,9 @@ cwd = os.getcwd()  # Get the current working directory (cwd)
 files = os.listdir(cwd)  # Get all the files in that directory
 print("Files in %r: %s" % (cwd, files)) # End DAR Debug
 
-with open('out50-90.csv', newline='') as csvfile:
+os.chdir("/Users/lucy/Desktop/assortedcodes")
+
+with open('outfail3(0).csv', newline='') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for line in reader:
         fn1 = line[0]
@@ -17,19 +19,20 @@ with open('out50-90.csv', newline='') as csvfile:
         fn3 = re.sub(r'[/\\]', '', line[2])
         date = line[3]
         print(date)
-        twodigityear=date[-2:]
+        twodigityear=date[2:4]
         print(twodigityear)
         twodigityear=int(twodigityear)
+
         if twodigityear<50:
             year = 2000 + twodigityear 
         else: 
             year= 1900 +twodigityear 
         print(year)
         year=str(year)
-        saveas = '-'.join([fn1, fn4])
+        saveas = '-'.join([fn3, year])
         saveasnew = saveas.replace("/", "~") + ".txt"
         # Reorganize to rename the output filename.
-        url =  line[4].strip()
+        url =  line[9].strip()
         #DAR Debug
         print(line[0])
         print(line[1])
@@ -39,7 +42,7 @@ with open('out50-90.csv', newline='') as csvfile:
         print(url) # End DAR Debug
 
         bodytext=requests.get(url).text 
-        parsedContent=BeautifulSoup(bodytext, 'html.parser')
+        parsedContent=BeautifulSoup(bodytext)
         for script in parsedContent(["script", "style"]): 
             script.extract()
         text = parsedContent.get_text()
@@ -50,6 +53,8 @@ with open('out50-90.csv', newline='') as csvfile:
             #f.write(requests.get('%s' % text).content)
             #f.print(file, 'downloaded and wrote to text file')
             #f.close()
+
+        os.chdir("/Users/lucy/Desktop/new")
 
         # File output code from https://www.guru99.com/reading-and-writing-files-in-python.html
         f = open(saveasnew, "w+")

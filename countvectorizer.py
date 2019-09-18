@@ -37,7 +37,7 @@ debug3 = True
 
 #a.encode('utf-8').strip()
 
-os.chdir("/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic")
+os.chdir("/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdictest1")
 
 file=[]
 corpus=[]
@@ -49,7 +49,7 @@ corpus=[]
     #print(os.path.join("/mydir", file))
 ##############################################################################
 
-for files in glob.glob("/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/*.txt"):
+for files in glob.glob("/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdictest1/*.txt"):
 #alternative: glob.glob(".txt/*"):
     with open(files) as f: 
 
@@ -84,7 +84,7 @@ for files in glob.glob("/Users/lucy/Desktop/assortedcodes/assortedcodes/newdicte
 
 
 
-vectorizer = TfidfVectorizer(input=files,stop_words='english', ngram_range=(1,2),analyzer="word",min_df=1)
+vectorizer = CountVectorizer(input=files,stop_words='english', ngram_range=(1,1),analyzer="word",min_df=1)
 #if debug: 
   #print(vectorizer)
 
@@ -117,8 +117,8 @@ word_count_vector=vectorizer.fit_transform(corpus)
     #file2=[]
     #lines.append(file2)
     #list(file2)
-tf_transformer = TfidfTransformer(use_idf=True).fit(word_count_vector)
-X_train_tf = tf_transformer.transform(word_count_vector)
+#tf_transformer = TfidfTransformer(use_idf=True).fit(word_count_vector)
+#X_train_tf = tf_transformer.transform(word_count_vector)
 
     #print(vectorizer.get_feature_names())
 
@@ -130,58 +130,15 @@ X_train_tf = tf_transformer.transform(word_count_vector)
 
 
 #idf=X_train_tf.toarray()
-idf=vectorizer._tfidf.idf_
+#idf=vectorizer._tfidf.idf_
 if debug3: 
-  print(vectorizer.get_feature_names(),idf)
+  print(vectorizer.get_feature_names(),vectorizer.vocabulary_)
     #print(idf)
-p =zip(vectorizer.get_feature_names(),idf)
+p =zip(vectorizer.get_feature_names(),vectorizer.vocabulary_)
     # p.sort(key = lambda t: t[1])
 
 
-with open('ngram=1(3)tfidf.csv', 'w') as csvfile:
+with open('ngram=1(1)count.csv', 'w') as csvfile:
   fwriter = csv.writer(csvfile)
   for row in p:
     fwriter.writerow(row)
-
-
-    ##  This piece of codes below was what I tried out but unsuccessfully 
-    #writer = csv.writerow(p, delimiter=';', lineterminator='\n')
-
-
-    #This piece of codes write out the words in the form of a .txt file, I dont know if this is of any use
-#with open('daemons2.txt', 'w') as fp:
-  #fp.write('\n'.join('%s %s' % x for x in p))
-
-    #with open("tfidf.txt","w") as t:
-      #for x in p:
-        #t.print(x)
-        #t.close()
-      
-
-
-
-##
-##
-##
-##for files in os.listdir():
-##    for line in open(files).readlines():
-##    with open(os.path.join(root,files),"r") as auto:
-##        vectorizer = TfidfVectorizer()
-##        word_count_vector=vectorizer.fit_transform(line)
-##
-##
-##print(vectorizer.vocabulary)
-##
-##Error Iterable over raw text documents expected, string object received
-##The solution to this problem is because input is just a String, but what is needed is a list (or an iterable) containing a single element (which is nothing but the String itself).
-
-#Error Iterable over raw text documents expected, string object received
-#The solution to this problem is because input is just a String, but what is needed is a list (or an iterable) containing a single element (which is nothing but the String itself).
-
-##AttributeError: 'list' object has no attribute 'lower' gensim
-
-
-  #data = [line.strip() for line in open(files).readlines()]
-    #The TFIDF Vectorizer should expect an array of strings. So if you pass him an array of arrays of tokenz, it crashes.
-
-#texts = [[word.lower() for word in text.split()] for text in data]
