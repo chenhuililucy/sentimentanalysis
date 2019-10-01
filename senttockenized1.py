@@ -15,6 +15,9 @@
 #https://stackoverflow.com/questions/34449127/sklearn-tfidf-transformer-how-to-get-tf-idf-values-of-given-words-in-document
 #http://wordlist.aspell.net/12dicts-readme/#classic
 
+#https://stackoverflow.com/questions/29423567/python-split-a-string-by-diffrent-full-stops
+
+#".".join(file.split(".")[2:])
 
 import re
 import sys
@@ -61,12 +64,12 @@ for files in glob.glob("/Users/lucy/Desktop/assortedcodes/assortedcodes/newdicte
 
 
 #alternative: glob.glob(".txt/*"):
-    with open('/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/1.csv', newline='') as infile:
+    with open('/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/externalwordlist.csv', newline='') as infile:
         with open('fail12.csv', 'w') as csvfile:
             records = csv.reader(infile)
             for r in records: 
                 with open(files) as f: 
-                    
+                    #lineList=f.split(".")
 
                     #r[0]=dictionary
         #print(files)
@@ -74,7 +77,8 @@ for files in glob.glob("/Users/lucy/Desktop/assortedcodes/assortedcodes/newdicte
                     lineList = f.readlines()
 
                     for line in lineList:
-                        if r[0] in line:
+                        #line=line1.split(".")
+                        if r[1] in line:
                             print(line)
                             #for r
                             fwriter = csv.writer(csvfile)

@@ -41,7 +41,7 @@ vectorizer = TfidfVectorizer(input=files,stop_words='english', ngram_range=(1,2)
 
 p=zip(vectorizer.get_feature_names())
 
-with open('ngram=1(1).csv', 'w') as csvfile:
+with open('ngram=1or2version2.csv', 'w') as csvfile:
   fwriter = csv.writer(csvfile)
   for row in p:
     fwriter.writerow(row)

@@ -60,9 +60,10 @@ def main():
 
     f_out = open(OUTPUT_FILE, 'w')
     wr = csv.writer(f_out, lineterminator='\n')
+    #what is the lineterminator for? 
     wr.writerow(OUTPUT_FIELDS)
-
     file_list = glob.glob(TARGET_FILES)
+    #neater than your codes 
     for file in file_list:
         print(file)
         with open(file, 'r', encoding='UTF-8', errors='ignore') as f_in:
@@ -119,6 +120,8 @@ def get_data(doc):
     return _odata
 
 
+
+#I have no idea as to what the following bits mean 
 if __name__ == '__main__':
     print('\n' + time.strftime('%c') + '\nGeneric_Parser.py\n')
     main()

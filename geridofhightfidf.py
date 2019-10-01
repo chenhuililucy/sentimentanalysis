@@ -2,9 +2,9 @@
 import csv
 
 
-with open ('/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/ngram=13tfidfout.csv', 'w') as outfile:
+with open ('/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/ngram=13tfidnew.csv', 'w') as outfile:
 
-    with open('/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/ngram13tfidfcopy1.csv', 'r') as csvfile:
+    with open('/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/ngram=1or2version2.csv', 'r') as csvfile:
         records = csv.reader(csvfile)
 
         for row in records: 

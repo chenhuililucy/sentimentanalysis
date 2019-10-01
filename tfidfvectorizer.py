@@ -138,7 +138,7 @@ p =zip(vectorizer.get_feature_names(),idf)
     # p.sort(key = lambda t: t[1])
 
 
-with open('ngram=1(3)tfidf.csv', 'w') as csvfile:
+with open('ngram=1or2version2.csv', 'w') as csvfile:
   fwriter = csv.writer(csvfile)
   for row in p:
     fwriter.writerow(row)
