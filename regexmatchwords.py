@@ -209,4 +209,6 @@ for files in glob.glob(corpus):
                                 with open("amplifynegper.csv","a") as f_out3:
                                     wr3=csv.writer(f_out3)
                                     wr3.writerow([ampword+" "+matched+" "+negperword]) 
-                  
+
+#add performance + "" + negator 
+#Put a space before and after each negator/amplifer/performance 
