@@ -1,4 +1,4 @@
-						Contributions: 
+				Contributions: 
 
 •	Attribution theory dictionary and reading engine, similar to LM, but with more complex semantic structures that can be reapplied to any research relating to internal, external or performance based 10-K vocabulary, or any financial use to extract components of 10-Ks that contain the aforementioned language
 •	Test the correlation between performance and internal and external sentiments 
@@ -7,7 +7,7 @@
 
 
 
-				Online code database which does the following: 
+Online code database which does the following: 
 
 •	Formalize heuristics for regex extraction of a specific part of 10-K eg. MD&A  
 •	In depth discussion of web scrapping efficiency 
@@ -16,9 +16,9 @@
 •	Systematic way to select testing set (cik)  
 
 
-					 10-K filing complete extraction
+10-K filing complete extraction
 
-					      Extract raw files: 
+Extract raw files: 
 
 extracthtml.py
 convertcsv.py
@@ -26,14 +26,14 @@ DAR0.py
 
 Missing: parsing heuristics but introduced in LM’s codes
 
-						Using LM database:
+Using LM database:
 
 renamefiles.py
 movenewdirs.py
 movefiles.py
 
 
-  					       MD&A extraction
+  MD&A extraction
 
 Original testing concepts/trials: 
 For loop + Boolean trails: tfidftrial1.py, test 2.py, extractsections.py
@@ -42,23 +42,25 @@ Extract MD&A sample codes:
 onlinecodes.py / MDA.py
 edgar1.py
 
+
+
 Finalized:
 newMDA.py, wordcount<100.py
 
-					   Item 13 extraction: 
+Item 13 extraction: 
 convertcsv1.py
 Item13.py
 sortfailv4.py
 extractpreequitysection.py
 
 
-					      Vocabulary 
+Vocabulary 
 
 tfidfvectorizer.py
 getridofhightfidf.py
 
 
-					  Building dictionary
+				                 Parser 
 
 senttockenized.py
 regexmatchwords.py
@@ -70,7 +72,15 @@ Reference LM’s code: Generic_Parser.py
 Others: LM stopwords.py
 
 
+		 		                 POS tags
 
 
+transformwords.py
 
 
+				Sorting words with heuristics 
+
+analyze.py 
+aaronsortwords.py
+useless.py 
+replacecountryname.py
