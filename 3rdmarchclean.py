@@ -184,6 +184,8 @@ class MANIP:
                 indexPos+=1 
             except ValueError:
                 break 
+        #debug11 March :nothing wrong with fucntion 
+        print(indexlist)
         return indexlist
 
     def getfuture(self): 
@@ -216,20 +218,22 @@ class MANIP:
         importancerankngramsfutures=[]
 
 
+        # Debug 11 March: corrected variable names
+
         for a in range(len(phraselist)):
             for i in futures: 
-                if len(phraselist[a].split(" "))>1: 
-                    if phraselist[a].split(" ")[0]==i or phraselist[a].split(" ")[1]==i: 
-                        futuresngrams.append(phraselist[a])
-                        tfidfdeletedngramsfutures.append(importancerank[a])
-                        numdeletedngramsfutures.append(num[a])
-                        importancerankngramsfutures.append(tfidf[a])
+                if len(classifyingphraselist[a].split(" "))>1: 
+                    if classifyingphraselist[a].split(" ")[0]==i or classifyingphraselist[a].split(" ")[1]==i: 
+                        futuresngrams.append(classifyingphraselist[a])
+                        importancerankngramsfutures.append(classifyingimportancerank[a])
+                        numdeletedngramsfutures.append(classifyingnum[a])
+                        tfidfdeletedngramsfutures.append(classifyingtfidf[a])
                 else: 
-                    if phraselist[a]==i:
+                    if classifyingphraselist[a]==i: 
                         futuresngrams.append(phraselist[a])
-                        tfidfdeletedngramsfutures.append(importancerank[a])
-                        numdeletedngramsfutures.append(num[a])
-                        importancerankngramsfutures.append(tfidf[a])
+                        importancerankngramsfutures.append(classifyingimportancerank[a])
+                        numdeletedngramsfutures.append(classifyingnum[a])
+                        tfidfdeletedngramsfutures.append(classifyingtfidf[a])
                     
 
         return futures, tfidfutures, numutures, importancerankfutures, futuresngrams, tfidfdeletedngramsfutures, numdeletedngramsfutures, importancerankngramsfutures
@@ -243,8 +247,11 @@ class MANIP:
                 dic[anylist[i]]+=1 
             else: 
                 dic.update({anylist[i]:int(1)}) 
-        sortedwords=[k for k in dic]
-        self.convertindex(anylist,sortedwords)
+        sortedwords=[k for k in dic.keys()] #alternatively, can do list(dic)
+        print("DEBUG 11 M" + "sortedwords" + "/n") 
+        for i in sortedwords: 
+            print(i)
+        #self.convertindex(anylist,sortedwords)
         return sortedwords 
 
     def delete(self): 
@@ -272,24 +279,27 @@ class MANIP:
         global importancerankfuturesdeletedngrams
 
 
+        # Debug 11 March 
+        # should be executed on classifying phrase list, not the phraselist 
+
         deletedngrams=[]
         tfidfdeletedngrams=[]
         numdeletedngrams=[]
         importancerankfuturesdeletedngrams=[]
-        for a in range(len(phraselist)):
+        for a in range(len(classifyingphraselist)):
             for i in deleted: 
-                if len(phraselist[a].split(" "))>1: 
-                    if phraselist[a].split(" ")[0]==i or phraselist[a].split(" ")[1]==i: 
-                        deletedngrams.append(phraselist[a])
-                        importancerankfuturesdeletedngrams.append(importancerank[a])
-                        numdeletedngrams.append(num[a])
-                        tfidfdeletedngrams.append(tfidf[a])
+                if len(classifyingphraselist[a].split(" "))>1: 
+                    if classifyingphraselist[a].split(" ")[0]==i or classifyingphraselist[a].split(" ")[1]==i: 
+                        deletedngrams.append(classifyingphraselist[a])
+                        importancerankfuturesdeletedngrams.append(classifyingimportancerank[a])
+                        numdeletedngrams.append(classifyingnum[a])
+                        tfidfdeletedngrams.append(classifyingtfidf[a])
                 else: 
-                    if phraselist[a]==i: 
-                        deletedngrams.append(phraselist[a])
-                        importancerankfuturesdeletedngrams.append(importancerank[a])
-                        numdeletedngrams.append(num[a])
-                        tfidfdeletedngrams.append(tfidf[a])
+                    if classifyingphraselist[a]==i: 
+                        deletedngrams.append(classifyingphraselist[a])
+                        importancerankfuturesdeletedngrams.append(classifyingimportancerank[a])
+                        numdeletedngrams.append(classifyingnum[a])
+                        tfidfdeletedngrams.append(classifyingtfidf[a])
 
 
         return deleted,tfidfdeleted,numdeleted,importancerankfuturesdeleted,deletedngrams,importancerankfuturesdeletedngrams,numdeletedngrams,tfidfdeletedngrams
@@ -314,11 +324,11 @@ class MANIP:
 
         reverse_concatenatedlist=deletedngrams+futuresngrams
         newphraselist=list(set(sortedwords).symmetric_difference(reverse_concatenatedlist))
-        self.convertindex(phraselist,sortedwords) 
+        self.convertindex(classifyingphraselist,sortedwords) 
         for i in indexlist:
-            newtfidf.append(tfidf[i])
-            newnum.append(num[i])
-            newimportancerank.append(importancerank[i])
+            newtfidf.append(classifyingphraselist[i])
+            newnum.append(classifyingnum[i])
+            newimportancerank.append(classifyingimportancerank[i])
 
         """
         Debug 7 March 
@@ -327,6 +337,12 @@ class MANIP:
         newimportancerank=list(set(importancerank).symmetric_difference(importancerankfuturesdeletedngrams+importancerankngramsfutures))
         """
 
+        """
+        Debug 11 March
+        Corrected variable names
+        """
+
+
         return newphraselist, newtfidf, newnum, newimportancerank
 
     def ridplurals(self): 
@@ -334,6 +350,8 @@ class MANIP:
         global newclassifyingtfidf
         global newclassifyingnum
         global newclassifyingimportancerank
+        global sortedwords
+        global classifyingphraselist
         self.keep()
         newlist=[]
         newclassifyingtfidf=[]
@@ -379,9 +397,16 @@ class MANIP:
 
 
         self.removeduplicates(newlist) #returns sorted words 
+        print(sortedwords)
         self.convertindex(classifyingphraselist,sortedwords) # returns index list 
+        print(indexlist)
+
+        """ 
+        It seems that erroe is with the lines below 
+        """ 
+
         for element in indexlist: 
-            assert element.isdigit()
+            #assert element.isdigit()
             print(element)
             newclassifyingtfidf.append(classifyingtfidf[element])
             newclassifyingnum.append(classifyingnum[element])
