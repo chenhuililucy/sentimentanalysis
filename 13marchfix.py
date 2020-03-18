@@ -135,13 +135,18 @@ class MANIP:
 
         for i in range(len(classifyingnum)): 
             for a in amplifierlist: 
+                if "3" in classifyingnum[i]:
+                    classifyingnum[i]=classifyingnum[i][1:]
+                    classifyingnum[i]=classifyingnum[i]+"ampneg"        
                 #for b in classifyingphraselist: 
                 if len(classifyingphraselist[i].split(" "))>1:
+                        
                     if a==classifyingphraselist[i].split(" ")[0] or a==classifyingphraselist[i].split(" ")[1]: 
                         classifyingnum[i]=classifyingnum[i]+"ampneg"      
                 else: 
                     if a==classifyingphraselist[i]: 
                         classifyingnum[i]=classifyingnum[i]+"ampneg"
+                    
 
         """
         Note: Debug 5 March
@@ -328,9 +333,8 @@ class MANIP:
         newimportancerank=[]
 
         reverse_concatenatedlist=deletedngrams+futuresngrams
-        newphraselist=list(set(sortedwords).symmetric_difference(reverse_concatenatedlist))
+        newphraselist=list(set(newfinallist)-set(reverse_concatenatedlist))
 
-        indexlist1=[]
 
         """
 
@@ -350,12 +354,15 @@ class MANIP:
         """
 
         st=set(newphraselist)
-        indexlist1=[classifyingphraselist.index(i) for i in st if i in classifyingphraselist]
+        indexlist1=[newfinallist.index(i) for i in st if i in newfinallist]
 
         for i in indexlist1:
-            newtfidf.append(classifyingtfidf[i])
-            newnum.append(classifyingnum[i])
-            newimportancerank.append(classifyingimportancerank[i])
+            newphraselist.append(newfinallist[i])
+            newtfidf.append(newclassifyingtfidf[i])
+            newnum.append(newclassifyingnum[i])
+            newimportancerank.append(newclassifyingimportancerank[i])
+
+
 
         """
         Debug 7 March 
@@ -379,11 +386,16 @@ class MANIP:
         global newclassifyingimportancerank
         global sortedwords
         global classifyingphraselist
+        global hashmapbuilder 
+        global hashmapbuilder1
+        global indexlist1 
+        global newfinallist
         self.keep()
         newlist=[]
         newclassifyingtfidf=[]
         newclassifyingnum=[]
         newclassifyingimportancerank=[]
+        newfinallist=[]
         #Begin debug 5 March 
         #for i in classifyingphraselist:
             #i=list(i) 
@@ -391,7 +403,7 @@ class MANIP:
             #print(i.split(" ")[0])
         #while len(i.split(" "))>0: try:
         #print(classifyingphraselist)
-        hashmapbuilder=[]
+        hashmapbuilder=[] #list of original phrases
         for item in classifyingphraselist: 
             words=item.split(" ")
             postags=nltk.pos_tag([i for i in words if i]) # rid empty strings 
@@ -405,11 +417,11 @@ class MANIP:
                 word1,word2=postags
                 word1,postags1=word1
                 word2,postags2=word2
-                if postags1=="NN" and postags2!="NN": 
+                if (postags1=="NN" or postags1=="NNS") and (postags2!="NN" or postags2!="NNS") : 
                     finalword=pattern.en.singularize(word1)+" "+(word2)
-                elif postags2=="NN" and postags1!="NN": 
+                elif (postags2=="NN" or postags2=="NNS") and (postags1!="NN" or postags1!="NNS"): 
                     finalword=word1+" "+pattern.en.singularize(word2)
-                elif postags2=="NN" and postags1=="NN": 
+                elif (postags2=="NN" or postags2=="NNS") and (postags1=="NN" or postags1=="NNS"):
                     finalword=pattern.en.singularize(word1)+" "+pattern.en.singularize(word2)
                 else: 
                     finalword=item 
@@ -422,16 +434,20 @@ class MANIP:
                     for word1[0] in word1: 
                         #print(word1[0])
                         (word1,tag1)=(word1[0])
-                    if postags1=="NN": 
+                    if postags1=="NNS": 
                         finalword=pattern.en.singularize(word1) 
                     else: 
                         finalword=word1
+                else: 
+                    print("error")
+                    finalword=item
                 hashmapbuilder.append(item)
 
-            newlist.append(finalword) #except ValueError: pass 
+            newlist.append(finalword) #except ValueError: pass; at this point, len(newlist)=len(hasmapbuilder)
 
             #print(newlist)
 
+        assert len(newlist)==len(hashmapbuilder)
         self.removeduplicates(newlist) #returns sorted words 
 
         """
@@ -449,10 +465,12 @@ class MANIP:
 
         """
 
-        st=set(sortedwords)
+        #firstpass: want to find the words that are in sorted words and in newlist, sortedwordsbeing the smaller
+        st=set(sortedwords) # note that some elements in hashmapbuilder are not in sortedwords
         indexlist1=[newlist.index(i) for i in st if i in newlist]
+        #second pass: get all indexes of words selected and match with corresponding position in hashmapbuilder
         hashmapbuilder2=[]
-        for i in indexlist: 
+        for i in indexlist1: 
             hashmapbuilder2.append(hashmapbuilder[i])
         #self.convertindex(classifyingphraselist,sortedwords) 
         # returns index list 
@@ -478,22 +496,42 @@ class MANIP:
         #debug11 March :nothing wrong with fucntion, but rather inefficient solution 
 
         """
+        #return indexlist
         st=set(hashmapbuilder2)
         indexlist1=[classifyingphraselist.index(i) for i in st if i in classifyingphraselist]
-
+        print("length hashmap builder2")
+        print(len(hashmapbuilder2))
+        print("length, sortedwords")
+        print(len(sortedwords))
         print(len(indexlist1))
 
         """ 
         It seems that error is with the lines below 
         """ 
+        print(len(classifyingphraselist))
+        print(len(classifyingtfidf))
+        print(len(classifyingnum))
+        print(len(classifyingimportancerank))
 
-        for element in indexlist1: 
+
+        for element in sortedwords: 
+            newfinallist.append(element)
+
+        for i in indexlist1: 
             #assert element.isdigit()
             #print(element)
-            newclassifyingtfidf.append(classifyingtfidf[element])
-            newclassifyingnum.append(classifyingnum[element])
-            newclassifyingimportancerank.append(classifyingimportancerank[element])
-        return sortedwords, newclassifyingtfidf, newclassifyingnum,newclassifyingimportancerank
+            newclassifyingtfidf.append(classifyingtfidf[i])
+            newclassifyingnum.append(classifyingnum[i])
+            newclassifyingimportancerank.append(classifyingimportancerank[i])
+
+        
+        print(len(newfinallist))
+        print(len(newclassifyingtfidf))
+        print(len(newclassifyingnum))
+        print(len(newclassifyingimportancerank))
+        
+
+        return newfinallist, newclassifyingtfidf, newclassifyingnum,newclassifyingimportancerank
 
 
 class SOLUTIONS(MANIP): 
@@ -538,7 +576,7 @@ class SOLUTIONS(MANIP):
         print("donewithdeletedphrases")
 
         e=zip(newphraselist, newtfidf, newnum, newimportancerank)
-        with open("finalout.csv","w") as csvfile: 
+        with open("finalout2.csv","w") as csvfile: 
             fwriter = csv.writer(csvfile)
             for i in e: 
                 fwriter.writerow(i)
@@ -548,3 +586,195 @@ class SOLUTIONS(MANIP):
                 
 x=SOLUTIONS() 
 x.printsolutions()
+
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
+
+"""
+Due to potential indexing error, want to relabel everything in 3rdmarchsortfile. Then take intersection of 3marchsortfile and final2. 
+Whereby final2 is a subset of 3rdmarchsortfile
+
+"""
+
+
+dir1="/Users/lucy/Desktop/assortedcodes/sort/3marchsorted.csv" #classified 
+dir2="/Users/lucy/Desktop/assortedcodes/finalout2.csv" #classifying, needs correction 
+dir3="/Users/lucy/Desktop/assortedcodes/sort/3marchsortfile.csv" #classifying 
+originalcsv="/Users/lucy/Desktop/assortedcodes/sort/ngramrel.csv" #labeled perf words 
+
+
+import csv 
+import os 
+import re 
+import nltk
+import pattern
+from pattern.text.en import singularize
+from pattern.text.en import pluralize
+from pattern.en import pluralize, singularize
+from pattern.en import conjugate, lemma, lexeme,PRESENT,SG
+import random
+
+
+phraselist=[]
+tfidf=[] 
+num=[] 
+importancerank=[]
+
+with open(dir1,"r") as csvfile: #classified
+    freader = csv.reader(csvfile)
+    for row in freader: 
+        phraselist.append(row[0])
+        tfidf.append(row[1])
+        num.append(row[2])
+        importancerank.append(row[3])
+    csvfile.close()
+
+finallist=[]
+
+with open(dir2,"r") as csvfile: #classified
+    freader = csv.reader(csvfile)
+    for row in freader: 
+        finallist.append(row[0])
+    csvfile.close()
+
+classifyingphraselist=[]
+classifyingtfidf=[] 
+classifyingnum=[] 
+classifyingimportancerank=[]
+        
+with open(dir3,"r") as csvfile: #classfying
+    freader = csv.reader(csvfile)
+    for row in freader: 
+        classifyingphraselist.append(row[0])
+        classifyingtfidf.append(row[1])
+        classifyingnum.append(row[2])
+        classifyingimportancerank.append(row[3])
+    csvfile.close()
+
+ampneghraselist=[]
+ampnegclassifyingtfidf=[] 
+ampnegclassifyingnum=[] 
+ampnegclassifyingimportancerank=[]
+        
+with open(originalcsv,"r") as csvfile: #get amplifiers and negators 
+    freader = csv.reader(csvfile)
+    for row in freader: 
+        ampneghraselist.append(row[0])
+        ampnegclassifyingtfidf.append(row[1])
+        ampnegclassifyingnum.append(row[2])
+        ampnegclassifyingimportancerank.append(row[3])
+    csvfile.close()
+
+def convertindex(listcalled,iterable): 
+    global indexlist
+    indexlist=[]
+    indexPos=0 
+    while True: 
+        try: 
+            indexPos=listcalled.index(iterable,indexPos) #search for item in list from indexPos to end of list
+            indexlist.append(indexPos)
+            indexPos+=1 
+        except ValueError:
+            break 
+    #debug11 March :nothing wrong with fucntion 
+    print(len(indexlist))
+    print("convertindex")
+    return indexlist
+
+def markallperf(): 
+    convertindex(ampnegclassifyingnum,"x")
+    performancewords=[]
+    for i in indexlist: 
+        performancewords.append(ampneghraselist[i])
+    assert len(ampneghraselist)==len(ampnegclassifyingnum)
+    for i in range(len(classifyingnum)): 
+        for a in performancewords: 
+            if len(classifyingphraselist[i].split(" "))>1:
+                if a==classifyingphraselist[i].split(" ")[0] or a==classifyingphraselist[i].split(" ")[1]: 
+                    if "x" not in classifyingnum[i]:
+                        classifyingnum[i]=classifyingnum[i]+"x "
+            else: 
+                if a==classifyingnum[i]: 
+                    if "x" not in classifyingnum[i]:
+                        classifyingnum[i]=classifyingnum[i]+"x "
+    return classifyingnum
+
+def keep(): 
+    markallperf()
+    convertindex(ampnegclassifyingnum,"2")
+    amplifierlist=[]
+    for i in indexlist: 
+        amplifierlist.append(ampneghraselist[i])
+    for i in range(len(classifyingnum)): 
+        for a in amplifierlist: 
+            if "3" in classifyingnum[i]:
+                classifyingnum[i]=re.sub(r'[3]', "ampneg x",classifyingnum[i])
+            if "ampneg" not in classifyingnum[i]: 
+                if len(classifyingphraselist[i].split(" "))>1:
+                    if a==classifyingphraselist[i].split(" ")[0] or a==classifyingphraselist[i].split(" ")[1]: 
+                        classifyingnum[i]=classifyingnum[i]+"ampneg"      
+                else: 
+                    if a==classifyingphraselist[i]: 
+                        classifyingnum[i]=classifyingnum[i]+"ampneg"
+    return classifyingnum
+
+def change4tox(): 
+    keep()
+    convertindex(classifyingnum,"4")
+    for item in indexlist: 
+        classifyingnum[item]="x"
+        classifyingnum[item]=re.sub(r'[4]', "x",classifyingnum[item])
+    return classifyingnum
+
+def intersection():
+    change4tox()
+    assert len(classifyingnum)==len(classifyingphraselist)
+    st=set(finallist)
+
+    global outphraselist
+    global outclassifyingnum
+    global outclassifyingtfidf
+    global outclassifyingimportancerank
+    global newwords
+
+    indexlist=[classifyingphraselist.index(i) for i in st if i in classifyingphraselist]
+    outphraselist=[classifyingphraselist[i] for i in indexlist]
+    outclassifyingnum=[classifyingnum[i] for i in indexlist]
+    outclassifyingtfidf=[classifyingtfidf[i] for i in indexlist]
+    outclassifyingimportancerank=[classifyingimportancerank[i] for i in indexlist] 
+    newwords=[item for item in finallist if item not in classifyingphraselist]
+
+    return outphraselist,outclassifyingtfidf,outclassifyingnum,outclassifyingimportancerank
+
+def solution():
+    intersection()
+    a=zip(classifyingphraselist, classifyingtfidf,classifyingnum, classifyingimportancerank)
+    with open("debug1.csv","w") as csvfile: 
+        fwriter = csv.writer(csvfile)
+        for i in a: 
+            fwriter.writerow(i)
+        csvfile.close()
+    print("donewithdebug1")
+
+    b=zip(outphraselist,outclassifyingtfidf,outclassifyingnum,outclassifyingimportancerank)
+    with open("final3.csv","w") as csvfile: 
+        fwriter = csv.writer(csvfile)
+        for i in b: 
+            fwriter.writerow(i)
+        for i in newwords: 
+            fwriter.writerow([i])
+        csvfile.close()
+    print("donewithfinal3")
+
+"""
+    with open("newwords.csv","w") as csvfile: 
+        fwriter=csv.write(csvfile)
+        for i in newwords: 
+            fwriter.writerow([i])
+        csvfile.close() 
+    
+"""
+
+solution()
