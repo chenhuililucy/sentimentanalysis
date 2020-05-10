@@ -10,6 +10,7 @@ from pattern.text.en import pluralize
 from pattern.en import pluralize, singularize, conjugate
 from pattern.en import conjugate, lemma, lexeme,PRESENT,SG
 import os
+import re
 os.chdir("/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7")
 #import en #nodebox lib
 
@@ -21,6 +22,7 @@ Find all possible inflections of a phrase
 
 # utility function: converting noun to adjective and vice versa. 
 from nltk.corpus import wordnet as wn
+import re 
  
 # Just to make it a bit more readable
 WN_NOUN = 'n'
@@ -59,9 +61,9 @@ def convert(word, from_pos, to_pos):
     #debug 
     related_noun_lemmas=[]
     for drf in derivationally_related_forms: #list in nested list 
-        print(drf) #drf is 
+        #print(drf)
         for l in drf[1]: 
-            if checklemma(l.name()): 
+            if checklemma(l.name(),to_pos): 
                 return l.name()
 
 
@@ -71,7 +73,7 @@ from nltk.corpus import brown
 from collections import Counter, defaultdict
 
 
-def checklemma(wordspecific): 
+def checklemma(wordspecific, to_pos): 
     # x is a dict which will have the word as key and pos tags as values 
     x = defaultdict(list)
 
@@ -89,7 +91,7 @@ def checklemma(wordspecific):
         
 
     """
-            #print(l.lemmas())#
+            #print(l.lemmas())
             #print(l.name()) #l.name returns the actual word
             if len(l.split("."))>=2:
                 if l.split(".")[1]==to_pos or to_pos in (WN_ADJECTIVE, WN_ADJECTIVE_SATELLITE) and l.split('.')[1] in (WN_ADJECTIVE, WN_ADJECTIVE_SATELLITE): 
@@ -142,6 +144,9 @@ model = KeyedVectors.load_word2vec_format(glove_filename, binary=False)
 def close_adv(input, num=5, model_topn=50):
   positive = [input, 'happily']
   negative = [       'happy']
+  input=re.match("/^[A-Z]+$/i",input)
+  if input not in model.wv.vocab: 
+      return None
   all_similar = model.most_similar(positive, negative, topn=model_topn)
 
   def score(candidate):
@@ -312,30 +317,30 @@ def out(classifyingphraselist):
 
             elif postags2=="VBG" or postags2=="VBN" or postags2=="VBZ" or postags2=="VB" or  postags2=="VBZ": 
                 #finalword1=lemmatize(word1)
-                finalword1=en.verb.present(word2)
+                #finalword1=en.verb.present(word2)
                 f1=conjugate(word1,tense="past")
                 f4=conjugate(word1,tense="past",person=2)
                 f2=conjugate(word1,tense="infinitive")
                 f3=conjugate(word1,tense="present",person=3)
                 f5=conjugate(word1,tense="present",person=2)
-                cha.extend([f1,f2,f3,f4,f5])
+                cha1.extend([f1,f2,f3,f4,f5])
 
             elif postags2=="JJ": 
                 
                 finalword2=close_adv(word1) 
-                cha.append(word2)
-                cha.append(finalword2)
+                cha1.append(word2)
+                cha1.append(finalword2)
 
             elif postags2=="RB":
                 finalword2=close_adv(word1) 
-                cha.append(word2)
-                cha.append(finalword2)
+                cha1.append(word2)
+                cha1.append(finalword2)
 
 
             if x==y: 
-                for item in char1: 
-                    for item in char: 
-                        full=char+" "+char1
+                for item in cha1: 
+                    for item in cha: 
+                        full=cha+" "+cha1
                         amended.append(full)
 
 
