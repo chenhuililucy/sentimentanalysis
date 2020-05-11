@@ -338,10 +338,12 @@ def out(classifyingphraselist):
 
 
             if x==y: 
-                for item in cha1: 
-                    for item in cha: 
-                        full=cha+" "+cha1
-                        amended.append(full)
+                for item1 in cha1: 
+                    for item2 in cha: 
+                        if item1 is not None and item2 is not None: 
+                            full=item2+" "+item1
+                            full=item1+" "+item2
+                            amended.append(full)
 
 
 
@@ -391,36 +393,54 @@ def posttagperformance(amended):
     word2list=[]
     tag1list=[]
     tag2list=[]
+
+
+
+    """
+    for item in classifyingphraselist: 
+        words=item.split(" ")
+        postags=nltk.pos_tag([i for i in words if i])
+
+
+
+    """
+
+
+
     for element in amended:
     # with open(src, "r",encoding="utf-8", errors="ignore") as csvfile: 
     #     freader = csv.reader(csvfile)
     #     for row in freader: 
     #         words=row[0].split(" ")
-        postags=nltk.pos_tag(element)
+    #postags=nltk.pos_tag([i for i in words if i]) # rid empty strings
+
+        words=element.split(" ")
+        postags=nltk.pos_tag([i for i in words if i])
         if len(postags)>1: 
             word1,word2=postags
             word1,tag1=word1
             word2,tag2=word2
         else: 
-            word1=postags
-            #print(word1)
-            n=0
-            for word1[n] in word1: 
-                #print(word1[n])
-                (word1,tag1)=(word1[n])
-                word2="."
-                tag2="."
-                n+=1
+            if len(postags)==1:
+                word1=postags
+                #print(word1)
+
+                for word1[0] in word1: 
+                    #print(word1[n])
+                    (word1,tag1)=(word1[0])
+                    word2="."
+                    tag2="."
+
         word1list.append(word1)
         word2list.append(word2)
         tag1list.append(tag1)
         tag2list.append(tag2)
         result= [(word, tag) for word, tag in postags]
         list.append(result)
-        p=zip(word1list,tag1list,word2list,tag2list)    
-
+    
+    p=zip(word1list,tag1list,word2list,tag2list)    
             
-
+    os.chdir("/Users/lucy/Desktop/assortedcodes/")
     with open("afile(1)postagged2.csv","w",encoding="utf-8", errors="ignore") as csvfile:
         fwriter = csv.writer(csvfile)
         for i in p:
