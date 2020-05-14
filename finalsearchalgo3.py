@@ -278,7 +278,7 @@ def preprocess(sentence):
 
 
 
-direct="/Users/lucy/Desktop/assortedcodes/assortedcodes/examplesentences.txt"
+direct="/Users/lucy/Desktop/assortedcodes/assortedcodes/examplesentences(1).txt"
 
 # def writesentences(): 
 
@@ -346,47 +346,86 @@ def searchwords():
 
     ########
 
+    from collections import defaultdict
+
 
     #def internal wordlist 
 
-    internaldict={}
+    internaldict=defaultdict(list)
+
+
+    def merge(list1, list2): 
+        merged_list = [(list1[i], list2[i]) for i in range(0, len(list1))] 
+        return merged_list 
+
 
     with open("int.csv","r",errors="ignore") as internalfile: 
+        w1=[] 
+        w2=[]
+
         internalwords=csv.reader(internalfile)
         for row in internalwords: 
             singleinternalword=row[0].lower()
             if len(singleinternalword.split(" "))>1: 
-                word1=singleinternalword.split(" ")[0]
-                word2=singleinternalword.split(" ")[1]
-                internaldict.update({word1:word2})
+                w1.append(singleinternalword.split(" ")[0])
+                w2.append(singleinternalword.split(" ")[1])
+                #print(singleinternalword.split(" "))
+                #for word1, word2 in singleinternalword.split(" "):
+                #word1=singleinternalword.split(" ")[0]
+                #word2=singleinternalword.split(" ")[1]
+                #internaldict[word1].append(word2)
+                #internaldict.update({word1:word2})
             else: 
                 word1=singleinternalword
                 internaldict.update({word1:""})
+        
+    for a, b in list(zip(w1, w2)):
+        if a not in internaldict: 
+            internaldict[a] = [b]
+        else:
+            if not isinstance(internaldict[a], str):
+                internaldict[a].append(b)
+        #internaldict.setdefault(a, []).append(b)
+
             #print(internalwordlist)
     
 
     #def external wordlist 
 
-    externaldict={}
+    externaldict=defaultdict(list)
     with open("ext.csv","r",errors="ignore") as externalfile: 
+        w1=[]
+        w2=[]
         externalwords=csv.reader(externalfile)
         for row in externalwords: 
             singleexternalwords=row[0].lower()
             if len(singleexternalwords.split(" "))>1: 
-                word1=singleexternalwords.split(" ")[0]
-                word2=singleexternalwords.split(" ")[1]
-                externaldict.update({word1:word2})
+
+                w1.append(singleexternalwords.split(" ")[0])
+                w2.append(singleexternalwords.split(" ")[1])
+                #word1=singleexternalwords.split(" ")[0]
+                #word2=singleexternalwords.split(" ")[1]
+                #externaldict[word1].append(word2)
+                #externaldict.update({word1:word2})
             else: 
                 word1=singleexternalwords
                 externaldict.update({word1:""})
+
+
+    for a, b in list(zip(w1, w2)):
+        if a not in externaldict: 
+            externaldict[a] = [b]
+        else:
+            if not isinstance(externaldict[a], str):
+                externaldict[a].append(b)
             #print(externalwordlist)
 
 
     sentlog_outputfields=['filename','sentno','posperf','negperf','internal','external']
 
     corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
-    csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLM.csv"
-    csv2="/Users/lucy/Desktop//assortedcodes/builddic/vector.csv"
+    csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLM(1).csv"
+    csv2="/Users/lucy/Desktop//assortedcodes/builddic/vector(2).csv"
 
     externalsent=[]
     internalsent=[]
@@ -398,7 +437,7 @@ def searchwords():
     filename=[]
 
 
-    i=1
+    filenum=1 #correct as filenum 
 
     f_out=open(csv1,"w")
     wr=csv.writer(f_out)
@@ -407,14 +446,14 @@ def searchwords():
 
     for files in glob.glob(corpus):
         with open(files) as f: 
-            i=i+1 
+            filenum=filenum+1 
             content = f.read()
             re.sub("\n","",content)
             sent = re.split('(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)(\s|[A-Z].*)',content)
             
             
             sentno=0
-            for sentences in sent: # ISSUE: need to identify individual words, modify to match regex words, DONNOT use the  
+            for sentences in sent: # ISSUE: need to identify individual words, modify to match regex words
                 #print(sentences)
                 sentences=preprocess(sentences)
                 endext=True 
@@ -423,7 +462,7 @@ def searchwords():
                 endneg=True
                 endposperf=True 
                 endnegperf=True 
-                sentno=sentno+1 
+                sentno+=1
                 #print(sentno)
                 ww=word_tokenize(sentences)
                 sentnolist.append(sentno)
@@ -840,23 +879,24 @@ def searchwords():
                     endextstring=""
                     for i in range(len(ww)-3): 
                         if ww[i].lower() in externaldict:
-                            if externaldict[ww[i]]!="": 
-                                if externaldict[ww[i]].lower()==ww[i+1]: 
-                                    endextstring+=ww[i]+" "
-                                    endextstring+=ww[i+1]+" "
+                            for el in externaldict[ww[i]]:
+                                if el!="": 
+                                    if el.lower()==ww[i+1]: 
+                                        endextstring+=ww[i]+" "
+                                        endextstring+=ww[i+1]+" "
+                                        endext=False
+                                    if el.lower()==ww[i+2]: 
+                                        endextstring+=ww[i]+" "
+                                        endextstring+=ww[i+2]+" "
+                                        endext=False
+                                    if el.lower()==ww[i+3]: 
+                                        endextstring+=ww[i]+" "
+                                        endextstring+=ww[i+3]+" "
+                                        #print(internaldict[ww[i]])
+                                        endext=False
+                                else: 
+                                    endextstring+=ww[i]
                                     endext=False
-                                if externaldict[ww[i]].lower()==ww[i+2]: 
-                                    endextstring+=ww[i]+" "
-                                    endextstring+=ww[i+2]+" "
-                                    endext=False
-                                if externaldict[ww[i]].lower()==ww[i+3]: 
-                                    endextstring+=ww[i]+" "
-                                    endextstring+=ww[i+3]+" "
-                                    #print(internaldict[ww[i]])
-                                    endext=False
-                            else: 
-                                endextstring+=ww[i]
-                                endext=False
 
 
                 """
@@ -889,23 +929,24 @@ def searchwords():
                     for i in range(len(ww)-3): 
                         if ww[i].lower() in internaldict:
                             a=ww[i].lower()
-                            if internaldict[ww[i]]!="": 
-                                if internaldict[ww[i]].lower()==ww[i+1]: 
-                                    internalstring+=ww[i]+" "
-                                    internalstring+=ww[i+1]+" "
+                            for el in internaldict[ww[i]]:
+                                if el!="": 
+                                    if el.lower()==ww[i+1]: 
+                                        internalstring+=ww[i]+" "
+                                        internalstring+=ww[i+1]+" "
+                                        endint=False
+                                    if el.lower()==ww[i+2]: 
+                                        internalstring+=ww[i]+" "
+                                        internalstring+=ww[i+2]+" "
+                                        endint=False
+                                    if el.lower()==ww[i+3]: 
+                                        internalstring+=ww[i]+" "
+                                        internalstring+=ww[i+3]+" "
+                                        #print(externaldict[ww[i]])
+                                        endint=False
+                                else: 
+                                    internalstring+=ww[i]
                                     endint=False
-                                if internaldict[ww[i]].lower()==ww[i+2]: 
-                                    internalstring+=ww[i]+" "
-                                    internalstring+=ww[i+2]+" "
-                                    endint=False
-                                if internaldict[ww[i]].lower()==ww[i+3]: 
-                                    internalstring+=ww[i]+" "
-                                    internalstring+=ww[i+3]+" "
-                                    #print(externaldict[ww[i]])
-                                    endint=False
-                            else: 
-                                internalstring+=ww[i]
-                                endint=False
 
 
                 """
@@ -985,7 +1026,12 @@ def searchwords():
 
                 
                 Y=True
+                # Debug 14th of May
+                fsent.write(files)
+                sentno=int(sentno)
+                fsent.write(str(sentno))
                 if endnegperfstring is not "" and internal!=0:
+                    
                     fsent.write("endnegperf, int \n")
                     fsent.write(internalstring+"\n")
                     fsent.write(endnegperfstring+"\n")
@@ -1019,8 +1065,9 @@ def searchwords():
                     fsent.write(sentences + "\n"+ "\n")
 
                 elif endposperfstring is not "": 
-                    fsent.write("endposperf, int \n")
+                    fsent.write("endposperf \n")
                     fsent.write("\n")
+                    fsent.write(endposperfstring+"\n")
                     fsent.write(sentences + "\n"+ "\n")
                     Z=False 
         
@@ -1030,10 +1077,12 @@ def searchwords():
                     fsent.write(endposperfstring+"\n")
                     fsent.write("\n")
                     fsent.write(sentences + "\n"+ "\n")
+
                 elif endposperfstring is not "": 
                     if Z:
-                        fsent.write("endposperf, int \n")
+                        fsent.write("endposperf \n")
                         fsent.write("\n")
+                        fsent.write(endposperfstring+"\n")
                         fsent.write(sentences + "\n"+ "\n")
 
                 if internal!=0 and positive!=0 and negative!=0 and external!=0: 
@@ -1112,7 +1161,7 @@ def searchwords():
 
 
             if DEBUG:
-                if i==3:
+                if filenum==1000:
                     break 
                         
             
@@ -1159,8 +1208,8 @@ filename,posint,negint,posext,negext
 a=0 
 
 corpus="/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/*.txt"
-csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLM.csv"
-csv2="/Users/lucy/Desktop/assortedcodes/builddic/vector.csv"
+csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLM(1).csv"
+csv2="/Users/lucy/Desktop/assortedcodes/builddic/vector(1).csv"
 
 posintlist=[]
 negintlist=[]
