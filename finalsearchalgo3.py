@@ -51,6 +51,8 @@ os.chdir("/Users/lucy/Desktop/assortedcodes/builddic")
 posperdict={}
 negperfdict={}
 
+o=[]
+p=[]
 
 def combine2(): 
     posperflist=[]
@@ -68,6 +70,9 @@ def combine2():
                 records1=csv.reader(ampfile)
                 for row in records1:
                     amplifier=row[0].lower()
+                    # need editing
+                    p.append([w1,w2,amplifier])
+                    p.append([amplifier,w1,w2])
                     posperdict.update({w1:{w2:amplifier}})
                     posperdict.update({amplifier:{w1:w2}})
 
@@ -85,8 +90,42 @@ def combine2():
                 records1=csv.reader(negafile)
                 for row in records1:
                     negator=row[0].lower()
+                    o.append([w1,w2,amplifier])
+                    o.append([amplifier,w1,w2])
+
                     posperdict.update({w1:{w2:negator}})
                     posperdict.update({negator:{w1:w2}})
+
+    for a, b, c in list(o): 
+        if a not in negperfdict: 
+            negperfdict[a]={b:c}
+        else: 
+            if not isinstance(negperfdict[a], str): 
+                if b not in negperfdict[a]: 
+                    negperfdict[a][b]=[c]
+                else: 
+                    if not isinstance(negperfdict[a], str): 
+                        if c not in negperfdict[a][b]: 
+                            negperfdict[a][b].append(c)
+
+    #print(negperfdict)
+
+
+    for a, b, c in list(p): 
+        if a not in posperdict: 
+            posperdict[a]={b:c}
+        else: 
+            if not isinstance(posperdict[a], str): 
+                if b not in posperdict[a]: 
+                    posperdict[a][b]=[c]
+                else: 
+                    if not isinstance(posperdict[a], str): 
+                        if c not in posperdict[a][b]: 
+                            if not isinstance(posperdict[a][b], str): 
+                                posperdict[a][b].append(c)
+
+    #print(posperdict)
+
 
 
     with open("negperf.csv","r") as negfile: 
@@ -485,7 +524,7 @@ def searchwords():
                             #print(ww[i])
                             #print("y")
                             if posperdict[ww[i]]!="": 
-                                assert len(posperdict.get(ww[i]).keys())==1
+                                #assert len(posperdict.get(ww[i]).keys())==1
                                 #print(posperdict.get(ww[i]).keys())
                                 #for e in posperdict.get(ww[i]).keys(): 
                                     #print(e)
@@ -504,52 +543,71 @@ def searchwords():
                                         if i+4>=len(ww): 
                                             y3=False 
                                         
-                                        if y1:
 
-                                            """
-                                            Alternative possible method: 
-                                            posperdict.get(ww[i].lower(), {}).get(posperdict[ww[i]])
 
-                                            """
-                                            #print(posperdict.get(ww[i],{}).get(e))
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+2]:
-                                            #if posperdict[ww[i]][posperdict[ww[i]]]==ww[i+2]: 
-                                                endposperfstring+=ww[i]+" "
-                                                endposperfstring+=ww[i+1]+ " "
-                                                endposperfstring+=ww[i+2]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+1]+ " "
-                                                endposperf=False
-                                                break
+                                        for fin in posperdict.get(ww[i],{}).get(e): 
+                                            if y1:
+
+                                                """
+                                                Alternative possible method: 
+                                                posperdict.get(ww[i].lower(), {}).get(posperdict[ww[i]])
+
+                                                """
+                                                #print(posperdict.get(ww[i],{}).get(e))
+                                    
+                                                if fin==ww[i+2]:
+                                                #if posperdict[ww[i]][posperdict[ww[i]]]==ww[i+2]: 
+                                                    #endposperfstring+=ww[i]+" "
+                                                    #endposperfstring+=ww[i+1]+ " "
+                                                    #endposperfstring+=ww[i+2]+ " "
+                                                    for i in range(3): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "
+                                                    #endposperfstring+=ww[i]
+                                                    endposperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    for i in range(2): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "
+                                                        #endposperfstring+=ww[i]
+                                                        #endposperfstring+=" "
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+1]+ " "
+                                                    endposperf=False
+                                                    break
                                                 
-                                        if y2:
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+3]:
-                                            #if posperdict[ww[i]][posperdict[ww[i]]]==ww[i+3]: 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+1]+ " "
-                                                endposperfstring+=ww[i+3]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+1]+ " "
-                                                endposperf=False
-                                                break
-                                        if y3:
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+4]:
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+1]+ " "
-                                                endposperfstring+=ww[i+4]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+1]+ " "
-                                                endposperf=False
-                                                break
+                                            if y2:
+                                                if fin==ww[i+3]:
+                                                    for i in range(4): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "
+                                                #if posperdict[ww[i]][posperdict[ww[i]]]==ww[i+3]: 
+                                                    #endposperfstring+=ww[i]+ " "
+                                                    #endposperfstring+=ww[i+1]+ " "
+                                                    #endposperfstring+=ww[i+3]+ " "
+                                                    endposperf=False
+                                                    break
+                                                elif posperdict.get(ww[i],{}).get(e)=="": 
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+1]+ " "
+                                                    endposperf=False
+                                                    break
+                                            if y3:
+                                                if fin==ww[i+4]:
+                                                    for i in range(5): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+1]+ " "
+                                                    endposperfstring+=ww[i+4]+ " "
+                                                    endposperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+1]+ " "
+                                                    endposperf=False
+                                                    break
 
                                     if e==ww[i+2]: #match 3 rounds 
                                         y1=True 
@@ -561,43 +619,57 @@ def searchwords():
                                             y2=False
                                         if i+5>=len(ww): 
                                             y3=False 
-                                        if y1:
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+3]:        
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+2]+ " "
-                                                endposperfstring+=ww[i+3]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+2]+ " "
-                                                endposperf=False
-                                                break
-                                                
-                                        if y2:
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+4]: 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+2]+ " "
-                                                endposperfstring+=ww[i+4]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+2]+ " "
-                                                endposperf=False
-                                                break
-                                        if y3:
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+5]:
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+2]+ " "
-                                                endposperfstring+=ww[i+5]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+2]+ " "
-                                                endposperf=False
-                                                break
+
+
+                                        for fin in posperdict.get(ww[i],{}).get(e): 
+
+                                            if y1:
+                                                if fin==ww[i+3]:   
+
+
+                                                    for i in range(4): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "
+                                                    #endposperfstring+=ww[i+2]+ " "
+                                                    #endposperfstring+=ww[i+3]+ " "
+                                                    endposperf=False
+                                                    break
+                                                elif posperdict.get(ww[i],{}).get(e)=="": 
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+2]+ " "
+                                                    endposperf=False
+                                                    break
+                                                    
+                                            if y2:
+                                                if fin==ww[i+4]: 
+                                                    for i in range(5): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "
+                                                    #endposperfstring+=ww[i]+ " "
+                                                    #endposperfstring+=ww[i+2]+ " "
+                                                    #endposperfstring+=ww[i+4]+ " "
+                                                    endposperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+2]+ " "
+                                                    endposperf=False
+                                                    break
+                                            if y3:
+                                                if fin==ww[i+5]:
+                                                    for i in range(6): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "
+                                                    #endposperfstring+=ww[i]+ " "
+                                                    #endposperfstring+=ww[i+2]+ " "
+                                                    #endposperfstring+=ww[i+5]+ " "
+                                                    endposperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+2]+ " "
+                                                    endposperf=False
+                                                    break
 
                                     if e==ww[i+3]: 
                                         y1=True 
@@ -610,45 +682,57 @@ def searchwords():
                                         if i+6>=len(ww): 
                                             y3=False 
 
-                                        if y1:
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+4]:        
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+3]+ " "
-                                                endposperfstring+=ww[i+4]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+3]+ " "
-                                                endposperf=False
-                                                break
+
+                                        for fin in posperdict.get(ww[i],{}).get(e): 
+    
+                                            if y1:
+                                                if fin==ww[i+4]:    
+                                                    for i in range(5): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "    
+                                                    #endposperfstring+=ww[i]+ " "
+                                                    #endposperfstring+=ww[i+3]+ " "
+                                                    #endposperfstring+=ww[i+4]+ " "
+                                                    endposperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+3]+ " "
+                                                    endposperf=False
+                                                    break
 
 
-                                        if y2:
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+5]: 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+3]+ " "
-                                                endposperfstring+=ww[i+5]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+3]+ " "
-                                                endposperf=False
-                                                break
+                                            if y2:
+                                                if fin==ww[i+5]: 
+                                                    for i in range(6): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "    
+                                                    #endposperfstring+=ww[i]+ " "
+                                                    #endposperfstring+=ww[i+3]+ " "
+                                                    #endposperfstring+=ww[i+5]+ " "
+                                                    endposperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+3]+ " "
+                                                    endposperf=False
+                                                    break
 
-                                        if y3:
-                                            if posperdict.get(ww[i],{}).get(e)==ww[i+6]:
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+3]+ " "
-                                                endposperfstring+=ww[i+6]+ " "
-                                                endposperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endposperfstring+=ww[i]+ " "
-                                                endposperfstring+=ww[i+3]+ " "
-                                                endposperf=False
-                                                break
+                                            if y3:
+                                                if fin==ww[i+6]:
+                                                    for i in range(7): 
+                                                        endposperfstring+=ww[i]
+                                                        endposperfstring+=" "    
+                                                    #endposperfstring+=ww[i]+ " "
+                                                    #endposperfstring+=ww[i+3]+ " "
+                                                    #endposperfstring+=ww[i+6]+ " "
+                                                    endposperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endposperfstring+=ww[i]+ " "
+                                                    endposperfstring+=ww[i+3]+ " "
+                                                    endposperf=False
+                                                    break
 
 
                             else: #case where the second key does not exist
@@ -686,7 +770,7 @@ def searchwords():
                     for i in range(len(ww)-3): 
                         if ww[i].lower() in negperfdict:
                             if negperfdict[ww[i]]!="": 
-                                assert len(negperfdict.get(ww[i]).keys())==1
+                                #assert len(negperfdict.get(ww[i]).keys())==1
                                 for e in negperfdict.get(ww[i]).keys():
                                     if e==ww[i+1]:  #dict.keys() returns an iterable object
                                     #if posperdict[ww[i]].lower()==ww[i+1]: #match 3 rounds 
@@ -700,150 +784,163 @@ def searchwords():
                                         if i+4>=len(ww): 
                                             y3=False 
                                         
-                                        if y1:
+                                        for fin in negperfdict.get(ww[i],{}).get(e):
+                                            if y1:
 
-                                            """
-                                            Alternative possible method: 
-                                            posperdict.get(ww[i].lower(), {}).get(posperdict[ww[i]])
+                                                """
+                                                Alternative possible method: 
+                                                posperdict.get(ww[i].lower(), {}).get(posperdict[ww[i]])
 
-                                            """
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+2]:
-                                            #if posperdict[ww[i]][posperdict[ww[i]]]==ww[i+2]: 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+1]
-                                                endnegperfstring+=ww[i+2]
-                                                endnegperf=False
-                                                break
-                                            elif posperdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+1]
-                                                endnegperf=False
-                                                break
-                                                
-                                        if y2:
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+3]:
-                                            #if posperdict[ww[i]][posperdict[ww[i]]]==ww[i+3]: 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+1]
-                                                endnegperfstring+=ww[i+3]
-                                                endnegperf=False
-                                                break
-                                            elif negperfdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+1]
-                                                endnegperf=False
-                                                break
-                                        if y3:
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+4]:
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+1]
-                                                endnegperfstring+=ww[i+4]
-                                                endnegperf=False
-                                                break
-                                            elif negperfdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+1]
-                                                endnegperf=False
-                                                break
-
-                                    if negperfdict.get(ww[i]).keys()==ww[i+2]: #match 3 rounds 
-                                        y1=True 
-                                        y2=True
-                                        y3=True 
-                                        if i+3>=len(ww): #then list index out of range 
-                                            y1=False
-                                        if i+4>=len(ww): 
-                                            y2=False
-                                        if i+5>=len(ww): 
-                                            y3=False 
-                                        if y1:
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+3]:        
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+2]
-                                                endnegperfstring+=ww[i+3]
-                                                endnegperf=False
-                                                break
-                                            elif negperfdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+2]
-                                                endnegperf=False
-                                                break
-                                                
-                                        if y2:
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+4]: 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+2]
-                                                endnegperfstring+=ww[i+4]
-                                                endnegperf=False
-                                                break
-                                            elif negperfdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+2]
-                                                endnegperf=False
-                                                break
-                                        if y3:
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+5]:
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+2]
-                                                endnegperfstring+=ww[i+5]
-                                                endnegperf=False
-                                                break
-                                            elif negperfdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+2]
-                                                endnegperf=False
-                                                break
-
-                                    if posperdict.get(ww[i]).keys()==ww[i+3]: 
-                                        y1=True 
-                                        y2=True
-                                        y3=True 
-                                        if i+4>=len(ww): #then list index out of range 
-                                            y1=False
-                                        if i+5>=len(ww): 
-                                            y2=False
-                                        if i+6>=len(ww): 
-                                            y3=False 
-
-                                        if y1:
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+4]:        
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+3]
-                                                endnegperfstring+=ww[i+4]
-                                                endnegperf=False
-                                                break
-                                            elif negperfdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+3]
-                                                endnegperf=False
-                                                break
+                                                """
+                                                if fin==ww[i+2]:
+                                                    for i in range(3): 
+                                                        endnegperfstring+=ww[i]
+                                                        endnegperfstring+=" "    
+                                                #if posperdict[ww[i]][posperdict[ww[i]]]==ww[i+2]: 
+                                                    #endnegperfstring+=ww[i]
+                                                    #endnegperfstring+=ww[i+1]
+                                                    #endnegperfstring+=ww[i+2]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+1]
+                                                    endnegperf=False
+                                                    break
+                                                    
+                                            if y2:
+                                                if fin==ww[i+3]:
+                                                    for i in range(4): 
+                                                        endnegperfstring+=ww[i]
+                                                        endnegperfstring+=" "   
+                                                #if posperdict[ww[i]][posperdict[ww[i]]]==ww[i+3]: 
+                                                    #endnegperfstring+=ww[i]
+                                                    #endnegperfstring+=ww[i+1]
+                                                    #endnegperfstring+=ww[i+3]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+1]
+                                                    endnegperf=False
+                                                    break
+                                            if y3:
+                                                if fin==ww[i+4]:
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+1]
+                                                    endnegperfstring+=ww[i+4]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+1]
+                                                    endnegperf=False
+                                                    break
 
 
-                                        if y2:
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+5]: 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+3]
-                                                endnegperfstring+=ww[i+5]
-                                                endnegperf=False
-                                                break
-                                            elif negperfdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+3]
-                                                endnegperf=False
-                                                break
 
-                                        if y3:
-                                            if negperfdict.get(ww[i],{}).get(e)==ww[i+6]:
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+3]
-                                                endnegperfstring+=ww[i+6]
-                                                endnegperf=False
-                                                break
-                                            elif ponegperfdictsperdict.get(ww[i],{}).get(e)=="": 
-                                                endnegperfstring+=ww[i]
-                                                endnegperfstring+=ww[i+3]
-                                                endnegperf=False
-                                                break
+                                    for fin in negperfdict.get(ww[i]).keys():
+                                        if fin==ww[i+2]: #match 3 rounds 
+                                            y1=True 
+                                            y2=True
+                                            y3=True 
+                                            if i+3>=len(ww): #then list index out of range 
+                                                y1=False
+                                            if i+4>=len(ww): 
+                                                y2=False
+                                            if i+5>=len(ww): 
+                                                y3=False 
+                                            if y1:
+                                                if fin==ww[i+3]:        
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+2]
+                                                    endnegperfstring+=ww[i+3]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+2]
+                                                    endnegperf=False
+                                                    break
+                                                    
+                                            if y2:
+                                                if fin==ww[i+4]: 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+2]
+                                                    endnegperfstring+=ww[i+4]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+2]
+                                                    endnegperf=False
+                                                    break
+                                            if y3:
+                                                if fin==ww[i+5]:
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+2]
+                                                    endnegperfstring+=ww[i+5]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+2]
+                                                    endnegperf=False
+                                                    break
+
+
+                                    for fin in negperfdict.get(ww[i]).keys():
+
+                                        if fin==ww[i+3]: 
+                                            y1=True 
+                                            y2=True
+                                            y3=True 
+                                            if i+4>=len(ww): #then list index out of range 
+                                                y1=False
+                                            if i+5>=len(ww): 
+                                                y2=False
+                                            if i+6>=len(ww): 
+                                                y3=False 
+
+                                            if y1:
+                                                if fin==ww[i+4]:        
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+3]
+                                                    endnegperfstring+=ww[i+4]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+3]
+                                                    endnegperf=False
+                                                    break
+
+
+                                            if y2:
+                                                if fin==ww[i+5]: 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+3]
+                                                    endnegperfstring+=ww[i+5]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+3]
+                                                    endnegperf=False
+                                                    break
+
+                                            if y3:
+                                                if fin==ww[i+6]:
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+3]
+                                                    endnegperfstring+=ww[i+6]
+                                                    endnegperf=False
+                                                    break
+                                                elif fin=="": 
+                                                    endnegperfstring+=ww[i]
+                                                    endnegperfstring+=ww[i+3]
+                                                    endnegperf=False
+                                                    break
 
 
                                     else: #case where the second key does not exist
