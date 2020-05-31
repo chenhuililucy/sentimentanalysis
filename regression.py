@@ -99,6 +99,7 @@ for i in z:
 Part 2: retrieve all filedates
 """ 
 
+dic={}
 with open(dir1,"r") as posfile: 
     records=csv.reader(posfile)
     i=0
@@ -106,10 +107,43 @@ with open(dir1,"r") as posfile:
         if i==0: 
             pass
         i+=1
+        cik=row[7]
+        datadate=row[2]
         cshoc=row[4]
         eps=row[5]
-        prccd
-        prcod
+        prccd=row[6]
+        prcod=row[7]
+        gsector=row[9]
+        dic.update({(cik,datadate):(cshoc,eps,prccd,prcod,gsector)})
+
+
+l1=[]
+l2=[]
+l3=[]
+l4=[]
+l5=[]
+l6=[]
+l7=[]
+
+with open(csv2,"r") as e:
+    records=csv.reader(e)
+    i=0
+    for row in records:
+        if i==0: 
+            pass
+        year=row[1]
+        cik=row[2]
+        if (cik,year) in dic:
+            l1=[]
+            l2=[]
+            l3=[]
+            l4=[]
+            l5=[]
+            l6=[]
+            l7.append(dic[(cik:year)])
+
+
+        #prcod
 
 
 
