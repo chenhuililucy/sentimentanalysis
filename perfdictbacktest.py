@@ -21,6 +21,10 @@ negperflist.csv --------   csv with  amplifier & negator adjusted negative perfo
 
 '''
 
+corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
+csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(2).csv"
+csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(3).csv"
+
 from nltk import ngrams
 
 
@@ -44,6 +48,10 @@ from nltk.tokenize import RegexpTokenizer
 DEBUG=True 
 new=True
 
+negator="/Users/lucy/Desktop/assortedcodes/builddic/negatorfinal.csv"
+amplifier="/Users/lucy/Desktop/assortedcodes/builddic/amplifiedfinal.csv"
+negative="/Users/lucy/Desktop/assortedcodes/builddic/negativeperf.csv"
+positive="/Users/lucy/Desktop/assortedcodes/builddic/positiveperfcsv.csv"
 os.chdir("/Users/lucy/Desktop/assortedcodes/builddic") 
 
 ##########################################################################################################################################
@@ -58,8 +66,12 @@ o=[]
 p=[]
 
 def combine2(): 
+    global amplifier
+    global negator
+    global positive 
+    global negative
     posperflist=[]
-    with open("postperf.csv","r") as posfile: 
+    with open(positive,"r") as posfile: 
         records=csv.reader(posfile)
         for row in records:
             posperf=row[0].lower()
@@ -69,17 +81,17 @@ def combine2():
             else: 
                 w1=posperf
                 w2=""
-            with open("amplifier.csv","r") as ampfile: 
+            with open(amplifier,"r") as ampfile: 
                 records1=csv.reader(ampfile)
                 for row in records1:
-                    amplifier=row[0].lower()
+                    amplifier1=row[0].lower()
                     # need editing
-                    p.append([w1,w2,amplifier])
-                    p.append([amplifier,w1,w2])
-                    posperdict.update({w1:{w2:amplifier}})
-                    posperdict.update({amplifier:{w1:w2}})
+                    p.append([w1,w2,amplifier1])
+                    p.append([amplifier1,w1,w2])
+                    posperdict.update({w1:{w2:amplifier1}})
+                    posperdict.update({amplifier1:{w1:w2}})
 
-    with open("negperf.csv","r") as negfile: 
+    with open(negative,"r") as negfile: 
         records=csv.reader(negfile)
         for row in records:
             negperf=row[0].lower()
@@ -89,15 +101,15 @@ def combine2():
             else: 
                 w1=negperf
                 w2=""
-            with open("negator.csv","r") as negafile: 
+            with open(negator,"r") as negafile: 
                 records1=csv.reader(negafile)
                 for row in records1:
-                    negator=row[0].lower()
-                    o.append([w1,w2,amplifier])
-                    o.append([amplifier,w1,w2])
+                    negator1=row[0].lower()
+                    o.append([w1,w2,negator1])
+                    o.append([negator1,w1,w2])
 
-                    posperdict.update({w1:{w2:negator}})
-                    posperdict.update({negator:{w1:w2}})
+                    posperdict.update({w1:{w2:negator1}})
+                    posperdict.update({negator1:{w1:w2}})
 
     for a, b, c in list(o): 
         if a not in negperfdict: 
@@ -131,7 +143,7 @@ def combine2():
 
 
 
-    with open("negperf.csv","r") as negfile: 
+    with open(negative,"r") as negfile: 
         records=csv.reader(negfile)
         for row in records:
             negperf=row[0].lower()
@@ -141,15 +153,15 @@ def combine2():
             else: 
                 w1=negperf
                 w2=""
-            with open("amplifier.csv","r") as ampfile: 
+            with open(amplifier,"r") as ampfile: 
                 records1=csv.reader(ampfile)
                 for row in records1:
-                    amplifier=row[0].lower()
-                    negperfdict.update({w1:{w2:amplifier}})
-                    negperfdict.update({amplifier:{w1:w2}})
+                    amplifier1=row[0].lower()
+                    negperfdict.update({w1:{w2:amplifier1}})
+                    negperfdict.update({amplifier1:{w1:w2}})
 
 
-    with open("postperf.csv","r") as posfile: 
+    with open(positive,"r") as posfile: 
         records=csv.reader(posfile)
         for row in records:
             posperf=row[0].lower()
@@ -159,12 +171,12 @@ def combine2():
             else: 
                 w1=posperf
                 w2=""
-            with open("negator.csv","r") as negafile: 
+            with open(negator,"r") as negafile: 
                 records1=csv.reader(negafile)
                 for row in records1:
-                    negator=row[0].lower()
-                    negperfdict.update({negator:{w1:w2}})
-                    negperfdict.update({w1:{w2:negator}})
+                    negator1=row[0].lower()
+                    negperfdict.update({negator1:{w1:w2}})
+                    negperfdict.update({w1:{w2:negator1}})
 
 
 
@@ -172,36 +184,40 @@ def combine2():
 
 
 def combine(): 
+    global amplifier
+    global negator 
+    global positive
+    global negative
     posperflist=[]
-    with open("postperf.csv","r") as posfile: 
+    with open(positive,"r") as posfile: 
         records=csv.reader(posfile)
         for row in records:
             posperf=row[0]
-            with open("amplifier.csv","r") as ampfile: 
+            with open(amplifier,"r") as ampfile: 
                 records1=csv.reader(ampfile)
                 for row in records1:
-                    amplifier=row[0].lower()
-                    new=posperf+" "+amplifier
-                    new2=amplifier+" "+posperf   
+                    amplifier1=row[0].lower()
+                    new=posperf+" "+amplifier1
+                    new2=amplifier1+" "+posperf   
                     posperflist.append(new)
                     posperflist.append(new2)
                     #print(posperflist)
 
-    with open("negperf.csv","r") as negfile: 
+    with open(negative,"r") as negfile: 
         records=csv.reader(negfile)
         for row in records:
             negperf=row[0].lower()
-            with open("negator.csv","r") as negafile: 
+            with open(negator,"r") as negafile: 
                 records1=csv.reader(negafile)
                 for row in records1:
-                    negator=row[0].lower()
-                    new=negperf+" "+negator
-                    new2=negator+" "+negperf   
+                    negator1=row[0].lower()
+                    new=negperf+" "+negator1
+                    new2=negator1+" "+negperf   
                     posperflist.append(new)
                     posperflist.append(new2)
                     #print(posperflist)
 
-    with open("posperflist.csv","w") as posperffile: 
+    with open("posperlist1.csv","w") as posperffile: 
         filewriter0 = csv.writer(posperffile)
         for item in posperflist: 
             filewriter0.writerow([item])
@@ -209,35 +225,35 @@ def combine():
 
     negperflist=[]
 
-    with open("negperf.csv","r") as negfile: 
+    with open(negative,"r") as negfile: 
         records=csv.reader(negfile)
         for row in records:
             negperf=row[0].lower()
-            with open("amplifier.csv","r") as ampfile: 
+            with open(amplifier,"r") as ampfile: 
                 records1=csv.reader(ampfile)
                 for row in records1:
-                    amplifier=row[0].lower()
-                    new=negperf+" "+amplifier
-                    new2=amplifier+" "+negperf   
+                    amplifier1=row[0].lower()
+                    new=negperf+" "+amplifier1
+                    new2=amplifier1+" "+negperf   
                     negperflist.append(new)
                     negperflist.append(new2)
                     #print(posperflist)
 
-    with open("postperf.csv","r") as posfile: 
+    with open(positive,"r") as posfile: 
         records=csv.reader(posfile)
         for row in records:
             posperf=row[0].lower()
-            with open("negator.csv","r") as negafile: 
+            with open(negator,"r") as negafile: 
                 records1=csv.reader(negafile)
                 for row in records1:
-                    negator=row[0].lower()
-                    new=posperf+" "+negator
-                    new2=negator+" "+posperf   
+                    negator1=row[0].lower()
+                    new=posperf+" "+negator1
+                    new2=negator1+" "+posperf   
                     negperflist.append(new)
                     negperflist.append(new2)
                     #print(posperflist)
 
-    with open("negperflist.csv","w") as negperffile: 
+    with open("negperflist1.csv","w") as negperffile: 
         filewriter1 = csv.writer(negperffile)
         for item in negperflist: 
             filewriter1.writerow([item])
@@ -356,7 +372,7 @@ direct="/Users/lucy/Desktop/assortedcodes/assortedcodes/examplesentences(1).txt"
 def searchwords(): 
     global sentlist
     if new:
-        combine()
+        #combine()
         combine2()
     posperflist=[]
     
@@ -468,9 +484,6 @@ def searchwords():
 
     sentlog_outputfields=['filename','sentno','posperf','negperf','internal','external']
 
-    corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
-    csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(1).csv"
-    csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(2).csv"
 
     externalsent=[]
     internalsent=[]
@@ -543,9 +556,10 @@ def searchwords():
                                 if posperdict[ww[i]]!="": 
                                     for e in posperdict.get(ww[i]).keys():
                                             if e==ww[i+b]:
-                                                if ww[i+a+b]==posperdict.get(ww[i],{}).get(e)
+                                                if ww[i+a+b]==posperdict.get(ww[i],{}).get(e):
                                                     
                                                     posperfcnt+=sum([a,b])
+                                                    print(ww[i+a+b])
 
                 
 
@@ -556,8 +570,9 @@ def searchwords():
                                 if negperfdict[ww[i]]!="": 
                                     for e in negperfdict.get(ww[i]).keys():
                                             if e==ww[i+b]:
-                                                if ww[i+a+b]==negperfdict.get(ww[i],{}).get(e)
+                                                if ww[i+a+b]==negperfdict.get(ww[i],{}).get(e):
                                                     negperfcnt+=sum([a,b])
+                                                    print(ww[i+a+b])
                 
 
             
@@ -615,9 +630,6 @@ filename,posint,negint,posext,negext
 
 a=0 
 
-corpus="/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/*.txt"
-csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(1).csv"
-csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(2).csv"
 
 poslist=[]
 neglist=[]

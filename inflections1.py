@@ -15,6 +15,7 @@ os.chdir("/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7")
 #import en #nodebox lib
 
 
+
 """ 
 Find all possible inflections of a phrase 
 """ 
@@ -166,7 +167,7 @@ def close_adv(input, num=5, model_topn=50):
 
 src= "/Users/lucy/Desktop/assortedcodes/afile(1).csv"
 src= "/Users/lucy/Desktop/assortedcodes/intext15april.csv"
-src="/Users/lucy/Desktop/assortedcodes/negativeperf.csv"
+src="/Users/lucy/Desktop/assortedcodes/positiveperf.csv"
 
 
 classifyingphraselist=[]
@@ -233,6 +234,8 @@ Dependencies:
 #posttagperformance()
 
 
+os.chdir("/Users/lucy/Desktop/assortedcodes/")
+
 def out(classifyingphraselist): 
     global word1list
     global word2list
@@ -245,6 +248,7 @@ def out(classifyingphraselist):
     y=len(classifyingphraselist)
     for item in classifyingphraselist: 
         words=item.split(" ")
+        
         postags=nltk.pos_tag([i for i in words if i]) # rid empty strings
 
         x+=1 
@@ -265,244 +269,219 @@ def out(classifyingphraselist):
         if len(postags)>1:
         #[('And', 'CC'), ('now', 'RB')]
             word1,word2=postags
-            word1,postags1=word1
-            word2,postags2=word2
-            # if both word1 and word2 are nouns, then 4 matches
-            # if either one is noun, then 2 matches 
-            # else pass
-            if postags1=="NN": 
-                f1=pattern.en.pluralize(word1)
-                f2=convert(word1, "n", "JJ")
-                cha.extend([f1,f2])
-                cha.append(word1)
-            
-            elif postags1=="NNS": 
-                f1=pattern.en.singularize(word1)
-                f2=convert(word1, "n", "JJ")
-                cha.extend([f1,f2])
-                cha.append(word1)
-
-            elif postags1=="VBG" or postags1=="VBN" or postags1=="VBZ" or postags1=="VB" or  postags1=="VBZ": 
-                #finalword1=lemmatize(word1)
-                f1=conjugate(word1,tense="past")
-                f4=conjugate(word1,tense="past",person=2)
-                f2=conjugate(word1,tense="infinitive")
-                f3=conjugate(word1,tense="present",person=3)
-                f5=conjugate(word1,tense="present",person=2)
-                #f4=en.verb.present_participle(word1)
-                #f5=en.verb.past(word1)
-                cha.extend([f1,f2,f3,f4,f5])
-
-            elif postags1=="JJ": 
-                f2=convert(word1, "a", "NN")
-                f3=convert(word1, "a", "NNS")
-                f1=close_adv(word1) 
-                cha.append(word1)
-                cha.extend([f1,f2])
-
-            elif postags1=="RB": 
-                f1=close_adv(word1) 
-                cha.append(word1)
-                cha.append(f1)
-
-            else: 
-                cha.append(word1)
-
-            
-
-            # =============================================== #
-            if postags2=="NN": 
-                
-                finalword2=pattern.en.pluralize(word2)
-                cha1.append(finalword2)
-                cha1.append(word2)
-
-            elif postags2=="NNS": 
-                finalword2=pattern.en.singularize(word2)
-                cha1.append(finalword2)
-                cha1.append(word2)
-                #finalphrase.extend([finalword1+" "+finalword2,finalword1+" "+word2,word1+" "+finalword2,word1+" "+word2])
-
-            #else: 
-                #finalphrase.extend([finalword1+" "+word2,word1+" "+word2])
-
-
-            elif postags2=="VBG" or postags2=="VBN" or postags2=="VBZ" or postags2=="VB" or  postags2=="VBZ": 
-                #finalword1=lemmatize(word1)
-                #finalword1=en.verb.present(word2)
-                f1=conjugate(word2,tense="past")
-                f4=conjugate(word2,tense="past",person=2)
-                f2=conjugate(word2,tense="infinitive")
-                f3=conjugate(word2,tense="present",person=3)
-                f5=conjugate(word2,tense="present",person=2)
-                cha1.extend([f1,f2,f3,f4,f5])
-
-            elif postags2=="JJ": 
-                
-                finalword2=close_adv(word2) 
-                cha1.append(word2)
-                cha1.append(finalword2)
-
-            elif postags2=="RB":
-                finalword2=close_adv(word2) 
-                cha1.append(word2)
-                cha1.append(finalword2)
-
-
-            else: 
-                cha1.append(word2)
-
-            #if x==y: 
-            #print("cha1")
-            #print(cha1)
-            #print("cha")
-            #print(cha)
-            for item1 in cha1: 
-                for item2 in cha: 
-                    if item1!=item2:
-                        if item1 is not None and item2 is not None: 
-                            if item1!=[] and item2!=[]: # not sure why theres is an empty list
-                                full=item2+" "+item1
-                                amended.append(full)
-                                full=item1+" "+item2
-                                amended.append(full)
-
-        
-        else: 
-            if len(postags)==1: 
-                word1=postags 
-                #print(postags)
-
-                
-                for word1[0] in word1: 
-                    #print(word1[0])
-                    (word1,tag1)=(word1[0])
-            
-                #(word1,tag1)=(word)
-                if tag1=="NN": 
+            if word1!=word2:
+                word1,postags1=word1
+                word2,postags2=word2
+                # if both word1 and word2 are nouns, then 4 matches
+                # if either one is noun, then 2 matches 
+                # else pass
+                if postags1=="NN": 
                     f1=pattern.en.pluralize(word1)
-                    amended.append(f1)
-                    amended.append(word1)
-            
-                elif tag1=="NNS": 
+                    f2=convert(word1, "n", "JJ")
+                    cha.extend([f1,f2])
+                    cha.append(word1)
+                
+                elif postags1=="NNS": 
                     f1=pattern.en.singularize(word1)
-                    amended.append(f1)
-                    amended.append(word1)
+                    f2=convert(word1, "n", "JJ")
+                    cha.extend([f1,f2])
+                    cha.append(word1)
 
-                elif tag1=="VBG" or tag1=="VBN" or tag1=="VBZ" or tag1=="VB" or  tag1=="VBZ": 
+                elif postags1=="VBG" or postags1=="VBN" or postags1=="VBZ" or postags1=="VB" or  postags1=="VBZ": 
                     #finalword1=lemmatize(word1)
                     f1=conjugate(word1,tense="past")
                     f4=conjugate(word1,tense="past",person=2)
                     f2=conjugate(word1,tense="infinitive")
                     f3=conjugate(word1,tense="present",person=3)
                     f5=conjugate(word1,tense="present",person=2)
-                    amended.extend([f1,f2,f3,f4,f5])
+                    #f4=en.verb.present_participle(word1)
+                    #f5=en.verb.past(word1)
+                    cha.extend([f1,f2,f3,f4,f5])
 
-                elif tag1=="JJ": 
-                    f1=close_adv(word1) 
-                    amended.append(word1)
-                    amended.append(f1)
+                elif postags1=="JJ": 
+                    f2=convert(word1, "a", "NN")
+                    f3=convert(word1, "a", "NNS")
+                    f1=close_adv(word1 ) 
+                    cha.append(word1)
+                    cha.extend([f1,f2])
 
-                elif tag1=="RB":
+                elif postags1=="RB": 
                     f1=close_adv(word1) 
-                    amended.append(word1)
-                    amended.append(f1)
+                    cha.append(word1)
+                    cha.append(f1)
+
+                else: 
+                    cha.append(word1)
+
+                
+
+                # =============================================== #
+                if postags2=="NN": 
+                    
+                    finalword2=pattern.en.pluralize(word2)
+                    cha1.append(finalword2)
+                    cha1.append(word2)
+
+                elif postags2=="NNS": 
+                    finalword2=pattern.en.singularize(word2)
+                    cha1.append(finalword2)
+                    cha1.append(word2)
+                    #finalphrase.extend([finalword1+" "+finalword2,finalword1+" "+word2,word1+" "+finalword2,word1+" "+word2])
+
+                #else: 
+                    #finalphrase.extend([finalword1+" "+word2,word1+" "+word2])
+
+
+                elif postags2=="VBG" or postags2=="VBN" or postags2=="VBZ" or postags2=="VB" or  postags2=="VBZ": 
+                    #finalword1=lemmatize(word1)
+                    #finalword1=en.verb.present(word2)
+                    f1=conjugate(word2,tense="past")
+                    f4=conjugate(word2,tense="past",person=2)
+                    f2=conjugate(word2,tense="infinitive")
+                    f3=conjugate(word2,tense="present",person=3)
+                    f5=conjugate(word2,tense="present",person=2)
+                    cha1.extend([f1,f2,f3,f4,f5])
+
+                elif postags2=="JJ": 
+                    
+                    finalword2=close_adv(word2) 
+                    cha1.append(word2)
+                    cha1.append(finalword2)
+
+                elif postags2=="RB":
+                    finalword2=close_adv(word2) 
+                    cha1.append(word2)
+                    cha1.append(finalword2)
+
+
+                else: 
+                    cha1.append(word2)
+
+                #if x==y: 
+                #print("cha1")
+                #print(cha1)
+                #print("cha")
+                #print(cha)
+                for item1 in cha1: 
+                    for item2 in cha: 
+                        if item1 is not None and item2 is not None: 
+                            if item1!=item2:
+                                if item1!=[] and item2!=[]: # not sure why theres is an empty list
+                                    full=item2+" "+item1
+                                    amended.append(full)
+                                    full=item1+" "+item2
+                                    amended.append(full)
+
+            
+            else: 
+                if len(postags)==1: 
+                    word1=postags 
+                    #print(postags)
+
+                    
+                    for word1[0] in word1: 
+                        print(word1[0])
+                        (word1,tag1)=(word1[0])
+                
+                    #(word1,tag1)=(word)
+                    if tag1=="NN": 
+                        f1=pattern.en.pluralize(word1)
+                        amended.append(f1)
+                        amended.append(word1)
+                
+                    elif tag1=="NNS": 
+                        f1=pattern.en.singularize(word1)
+                        amended.append(f1)
+                        amended.append(word1)
+
+                    elif tag1=="VBG" or tag1=="VBN" or tag1=="VBZ" or tag1=="VB" or  tag1=="VBZ": 
+                        #finalword1=lemmatize(word1)
+                        f1=conjugate(word1,tense="past")
+                        f4=conjugate(word1,tense="past",person=2)
+                        f2=conjugate(word1,tense="infinitive")
+                        f3=conjugate(word1,tense="present",person=3)
+                        f5=conjugate(word1,tense="present",person=2)
+                        amended.extend([f1,f2,f3,f4,f5])
+
+                    elif tag1=="JJ": 
+                        f1=close_adv(word1) 
+                        amended.append(word1)
+                        amended.append(f1)
+
+                    elif tag1=="RB":
+                        f1=close_adv(word1) 
+                        amended.append(word1)
+                        amended.append(f1)
 
 
     #posttagperformance(amended)
 
 
 
-out(classifyingphraselist)
+
+# def posttagperformance(amended): 
+
+#     list=[]
+#     word1list=[] 
+#     word2list=[]
+#     tag1list=[]
+#     tag2list=[]
+
+
+#     print(len(amended))
+#     """
+#     for item in classifyingphraselist: 
+#         words=item.split(" ")
+#         postags=nltk.pos_tag([i for i in words if i])
+
+
+
+#     """
+
+
+
+#     for element in amended:
+#     # with open(src, "r",encoding="utf-8", errors="ignore") as csvfile: 
+#     #     freader = csv.reader(csvfile)
+#     #     for row in freader: 
+#     #         words=row[0].split(" ")
+#     #postags=nltk.pos_tag([i for i in words if i]) # rid empty strings
+#         if element is not None:
+#             words=element.split(" ")
+#             postags=nltk.pos_tag([i for i in words if i])
+#             if len(postags)>1: 
+#                 word1,word2=postags
+#                 word1,tag1=word1
+#                 word2,tag2=word2
+#             else: 
+#                 if len(postags)==1:
+#                     word1=postags
+#                     #print(word1)
+
+#                     for word1[0] in word1: 
+#                         #print(word1[n])
+#                         (word1,tag1)=(word1[0])
+#                     word2=None 
+#                     tag2=None
+
+#             word1list.append(word1)
+#             word2list.append(word2)
+#             tag1list.append(" ")
+#             tag2list.append(" ")
+#         #result= [(word, tag) for word, tag in postags]
+#         #list.append(result)
+
+#     fin=[]
+
+#     for i in range(len(word1list)): 
+#         if word2list[i]: 
+#             fin.append(word1list[i]+" "+word2list[i])
+#         else: 
+#             fin.append(word1list[i])
+
+
 
 """
-
-
-def posttagperformance(amended): 
-
-    list=[]
-    word1list=[] 
-    word2list=[]
-    tag1list=[]
-    tag2list=[]
-
-
-    print(len(amended))
-
-    for item in classifyingphraselist: 
-        words=item.split(" ")
-        postags=nltk.pos_tag([i for i in words if i])
-
-
-
-
-
-    os.chdir("/Users/lucy/Desktop/assortedcodes/")
-
-
-    for element in amended:
-    # with open(src, "r",encoding="utf-8", errors="ignore") as csvfile: 
-    #     freader = csv.reader(csvfile)
-    #     for row in freader: 
-    #         words=row[0].split(" ")
-    #postags=nltk.pos_tag([i for i in words if i]) # rid empty strings
-        if element is not None:
-            words=element.split(" ")
-            postags=nltk.pos_tag([i for i in words if i])
-            if len(postags)>1: 
-                word1,word2=postags
-                word1,tag1=word1
-                word2,tag2=word2
-            else: 
-                if len(postags)==1:
-                    word1=postags
-                    #print(word1)
-
-                    for word1[0] in word1: 
-                        #print(word1[n])
-                        (word1,tag1)=(word1[0])
-                    word2=None 
-                    tag2=None
-
-            word1list.append(word1)
-            word2list.append(word2)
-            tag1list.append(" ")
-            tag2list.append(" ")
-        #result= [(word, tag) for word, tag in postags]
-        #list.append(result)
-    
-
-    p=zip(word1list,tag1list,word2list,tag2list)    
-            
-
-
-
-    fin=[]
-
-    for i in range(len(word1list)): 
-        if word2list[i]: 
-            fin.append(word1list[i]+" "+word2list[i])
-        else: 
-            fin.append(word1list[i])
-
-    #out(classifyingphraselist)
-
-
-
-    #out(classifyingphraselist)
-    fin=[]
-    for i in range(len(word1list)): 
-        fin.append(word1list[i]+" "+word2list[i])
-
-
-
-    with open("negativeperf.csv(2).csv","w",encoding="utf-8", errors="ignore") as csvfile:
-        fwriter = csv.writer(csvfile)
-        for i in fin:
-            fwriter.writerow([i])
-        csvfile.close()
-
-
 
     with open("internalexternalfinal(2)(2).csv","w",encoding="utf-8", errors="ignore") as csvfile:
         fwriter = csv.writer(csvfile)
@@ -510,18 +489,32 @@ def posttagperformance(amended):
             fwriter.writerow(i)
         csvfile.close()
 
-
+"""
 
 
 out(classifyingphraselist)
 
+
+    
 """
 
-os.chdir("/Users/lucy/Desktop/assortedcodes/builddic/")
+    p=zip(word1list,tag1list,word2list,tag2list)    
+            
+    os.chdir("/Users/lucy/Desktop/assortedcodes/")
+    with open("positiveperfcsv(1).csv","w",encoding="utf-8", errors="ignore") as csvfile:
+        fwriter = csv.writer(csvfile)
+        for i in p:
+            fwriter.writerow(i)
+        csvfile.close()
 
-with open("negativeperf.csv(1).csv","w",encoding="utf-8", errors="ignore") as csvfile:
+        
+    #out(classifyingphraselist)
+
+"""
+
+with open("positiveperfcsv(2).csv","w",encoding="utf-8", errors="ignore") as csvfile:
     fwriter = csv.writer(csvfile)
     for i in amended:
-        if i is not None:
+        if i is not None: 
             fwriter.writerow([i])
     csvfile.close()
