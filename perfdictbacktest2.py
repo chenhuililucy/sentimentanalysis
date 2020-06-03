@@ -85,7 +85,7 @@ def combine2():
                 w2=posperf.split(" ")[1]
             else: 
                 w1=posperf
-                w2=""
+                w2="."
             
             posperdict[w1].append(w2)
 
@@ -101,7 +101,7 @@ def combine2():
                 w2=negperf.split(" ")[1]
             else: 
                 w1=negperf
-                w2=""
+                w2="."
             
             negperfdict[w1].append(w2)
 
@@ -306,16 +306,41 @@ direct="/Users/lucy/Desktop/assortedcodes/assortedcodes/examplesentences(1).txt"
 
 
 
-
+f1=[]
                    ###################
 def searchwords(): 
+    
     global sentlist
     if new:
         #combine()
         combine2()
     posperflist=[]
     
+    def c(i,a,b,ww,d,cnt,BOOL): 
+        if dict[ww[i+b]] is not None:
+            if ww[i+a+b] in d[ww[i+b]]: 
+                # print(ww[i:i+a+b+1])
+                # print(ww[i])
+                # print(ww[i+b])
+                # print(ww[i+a+b])
+                cnt+=sum([a,b])
+                i=i+a+b 
+                BOOL=False
+                return cnt,BOOL,i
+        return None 
 
+    def b(i,a,b,ww,s,cnt,BOOL):
+        if fww[i+a+b] in s:
+            # print(ww[i:i+a+b+1]) 
+            # print(ww[i])
+            # print(ww[i+b])
+            # print(ww[i+a+b])
+            i=i+a+b 
+            negperfcnt+=a+b
+            BOOl=False
+            return cnt, BOOL, i
+        return None
+        
 
     ########
 
@@ -421,7 +446,7 @@ def searchwords():
             #print(externalwordlist)
 
 
-    f1=[]
+    
 
     sentlog_outputfields=["filename","sentnolist","positiveperformancesent","negativeperformancesent","sentlen"]
 
@@ -453,9 +478,9 @@ def searchwords():
             content = f.read()
             text1=content.lower()
             matchedstring=""
-            for m in re.finditer(item, text1): 
+            for m in re.finditer(item.lower(), text1): 
                 if not m: 
-                    matchedstring=""
+                    matchedstring="."
                     raise Error
                     #print(file)
                 else:
@@ -484,9 +509,15 @@ def searchwords():
             for sentences in sent: # ISSUE: need to identify individual words, modify to match regex words
                 #print(sentences)
                 sentno+=1
-                ww=word_tokenize(sentences)
+
+                ww=[]
+                for r in word_tokenize(sentences): 
+                    if r.isalpha(): 
+                        ww.append(r)
+                #ww=[w in word_tokenize(sentences) if isalpha(w)]
+                #ww=[w in ww if w.isalpha()]
                 if len(ww)>=1:
-                    print(ww)
+                    #print(ww)
                     sentnolist.append(sentno)
                     if sentno==1: 
                         filename.append(files)
@@ -500,122 +531,225 @@ def searchwords():
                         for b in range(1,3):
                             for a in range(1,3):
                                 if BOOL:
-                                    if ww[i].lower() in negator and i+a+b<len(ww) :
-                                        if ww[i+b] in negperfdict :
-                                            if negperfdict[ww[i+b]] is not None:
-
-                                                if ww[i+a+b] in negperfdict[ww[i+b]]: 
-                                                    print(ww[i:i+a+b+1])
-                                                    posperfcnt+=sum([a,b])
-                                                    i=i+a+b 
-                                                    BOOl=False
-                                                    break 
-                                                    
-                                                
-                                                
-                                                elif ww[i+a+b] in posperdict[ww[i+b]]: 
-                                                    print(ww[i:i+a+b+1])
-                                                    negperfcnt+=sum([a,b])
-                                                    i=i+a+b 
-                                                    BOOl=False
-                                                    break 
-                                                
+                                    if ww[i].lower() in negatorset and i+a+b<len(ww) :
+                                        if negperfdict.get(ww[i+b]):
+                                        
+                                            # if c(i,a,b,ww,negperfdict,posperfcnt,BOOL) is not None:
+                                            #     posperfcnt,BOOL,i=c(i,a,b,ww,negperfdict,posperfcnt,BOOL)
+                                            #     break 
                                             
-                                            else: 
-                                                print(ww[i:i+b+a+1])
-                                                i=i+b+a
+
+
+                                            
+                                        # else: 
+                                        # #print(ww[i:i+b+a+1])
+                                        # #print(ww[i])
+                                        # #print(ww[i+b])
+                                        # #print(ww[i+a+b])
+                                        #     if 
+                                        #     i=i+b+a
+                                        #     BOOl=False
+                                        #     break
+                                        #     # elif c(i,a,b,ww,posperdict,negperfcnt,BOOL) is not None: 
+                                        #     #     negperfcnt,BOOL,i=c(i,a,b,ww,posperdict,negperfcnt,BOOL)
+                                        #     #     break
+                                                
+                                          
+                                            if ww[i+a+b] in negperfdict[ww[i+b]]: 
+                                                # print(ww[i:i+a+b+1])
+                                                # print(ww[i])
+                                                # print(ww[i+b)
+                                                # print(ww[i+a+b])
+                                                negperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in negperfdict[ww[i+b]] :
+                                                #print(ww[i:i+a+b+1])
+                                                #print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                posperfcnt+=b
+                                                i=i+b
+                                                BOOl=False
+                                                break
+                                          
+                                        if posperdict.get(ww[i+b]):
+
+                                            if ww[i+a+b] in posperdict[ww[i+b]]: 
+                                                # print(ww[i:i+a+b+1])
+                                                # print(ww[i])
+                                                # print(ww[i+b)
+                                                # print(ww[i+a+b])
+                                                posperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in posperdict[ww[i+b]] :
+                                                #print(ww[i:i+a+b+1])
+                                                #print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                posperfcnt+=b
+                                                i=i+b
                                                 BOOl=False
                                                 break
                                             
+                                        # else: 
+                                        #     #print(ww[i:i+b+a+1])
+                                        #     #print(ww[i])
+                                        #     #print(ww[i+b])
+                                        #     #print(ww[i+a+b])
+                                        #     i=i+b+a
+                                        #     BOOl=False
+                                        #     break
+                                            
 
-                                    elif ww[i].lower() in amplifier and i+a+b<len(ww): 
-                                        if ww[i+b] in posperdict:
-                                            if negperfdict[ww[i+b]] is not None:
-                                                if ww[i+a+b] in posperdict[ww[i+b]]: 
-                                                    print(ww[i:i+a+b+1])   
-                                                    posperfcnt+=sum([a,b])
-                                                    i=i+a+b 
-                                                    BOOl=False
-                                                    break
-                                                
-                                            
-                                                elif ww[i+a+b] in negperfdict[ww[i+b]]: 
-                                                    print(ww[i:i+a+b+1])
-                                                    negperfcnt+=sum([a,b])
-                                                    i=i+a+b 
-                                                    BOOl=False
-                                                    break 
-                                                
-                                            
-                                            else:
-                                                print(ww[i:i+b+a+1])          
-                                                i=i+b+a
+                                    elif ww[i].lower() in amplifierset and i+a+b<len(ww): 
+                                        if posperdict.get(ww[i+b]):
+                                            # if c(i,a,b,ww,posperdict,posperfcnt,BOOL) is not None: 
+                                            #     posperfcnt,BOOL,i=c(i,a,b,ww,posperdict,posperfcnt,BOOL)
+                                            #     break
+
+                                           
+                                            #if negperfdict[ww[i+b]] is not None:
+                                            if ww[i+a+b] in posperdict[ww[i+b]]: 
+                                                    # print(ww[i:i+a+b+1])
+                                                    # print(ww[i])
+                                                    # print(ww[i+b])
+                                                    # print(ww[i+a+b])                                                    
+                                                posperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break
+
+                                            elif "." in posperdict[ww[i+b]]:
+                                                posperfcnt+=b                                         
+                                                i=i+b
                                                 BOOl=False
                                                 break
                                             
+                                            
+                                            # elif c(i,a,b,ww,negperfdict,negperfcnt,BOOL) is not None: 
+                                            #     negperfcnt,BOOL,i=c(i,a,b,ww,negperfdict,negperfcnt,BOOL)
+                                            #     break
 
-                                    elif ww[i].lower() in negperfdict and i+a+b<len(ww): 
-                                        print(i+b)
-                                        print(len(ww))
+                                        if negperfdict.get(ww[i+b]):  
+                                            if ww[i+a+b] in negperfdict[ww[i+b]]: 
+                                                # print(ww[i:i+a+b+1])
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                negperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in negperfdict[ww[i+b]]: 
+                                                negperfcnt+=b 
+                                                i=i+b
+                                                BOOL=False
+                                                break
+                                        
+
+                    
+                                            # else:
+                                            #     #print(ww[i:i+b+a+1])   
+                                            #     #print(ww[i])
+                                            #     #print(ww[i+b])
+                                            #     #print(ww[i+a+b])
+                                            #     i=i+b+a
+                                            #     BOOl=False
+                                            #     break
+                                            
+
+                                    elif negperfdict.get(ww[i].lower()) and i+a+b<len(ww): 
+                                        #print(i+b)
+                                        #print(len(ww))
+                                        # if b(i,a,b,ww,amplifierset,negperfcnt,BOOL) is not None: 
+                                        #     negperfcnt,BOOL,i=b(i,a,b,ww,amplifierset,negperfcnt,BOOL)
+                                        
+                                        
                                         if ww[i+b] in negperfdict[ww[i].lower()]:
                                             #if negperfdict[ww[i+b]] is not None:
-                                            if ww[i+a+b] in amplifier: 
-                                                print(ww[i:i+a+b+1]) 
+                                            if ww[i+a+b] in amplifierset: 
+                                                # print(ww[i:i+a+b+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
                                                 i=i+a+b 
                                                 negperfcnt+=a+b
                                                 BOOl=False
                                                 break 
-                                            
-                                            elif ww[i+a+b] in negator: 
-                                                print(ww[i:i+a+b+1 ]) 
+                                        
+                                       
+                                        # elif b(i,a,b,ww,negatorset,posperfcnt,BOOL) is not None:
+                                        #     posperfcnt,BOOL,i=b(i,a,b,ww,negatorset,posperfcnt,BOOL)
+                                        
+                                            elif ww[i+a+b] in negatorset: 
+                                                # print(ww[i:i+a+b+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
                                                 i=i+a+b 
                                                 posperfcnt+=a+b
                                                 BOOl=False
                                                 break 
-                                            
-                                        elif "" in negperfdict[ww[i].lower()]:
-                                            if ww[i+b] in amplifier:
+                                      
+
+                                        #elif b(i,a,b,ww,negatorset,posperfcnt,BOOL):
+
+                                        elif "." in negperfdict[ww[i].lower()]:
+                                            if ww[i+b] in amplifierset:
                                                 negperfcnt+=sum([b,a])
-                                                print(ww[i:i+b+a+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                # print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
-                                            if ww[i+b] in negator:
+                                            if ww[i+b] in negatorset:
                                                 posperfcnt+=sum([b,a])
-                                                print(ww[i:i+b+a+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                # print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
                                             
 
 
-                                    elif ww[i].lower() in posperdict and i+a+b<len(ww): 
+                                    elif  posperdict.get(ww[i].lower()) and i+a+b<len(ww): 
                                         if ww[i+b] in posperdict[ww[i].lower()]:
                                             #if negperfdict[ww[i+b]] is not None:
-                                            if ww[i+a+b] in amplifier: 
-                                                print(ww[i:i+a+b+1]) 
+                                            if ww[i+a+b] in amplifierset: 
+                                                #print(ww[i:i+a+b+1]) 
                                                 i=i+a+b 
                                                 posperfcnt+=a+b
                                                 BOOl=False
                                                 break 
                                             
-                                            elif ww[i+a+b] in negator: 
-                                                print(ww[i:i+a+b+1]) 
+                                            elif ww[i+a+b] in negatorset: 
+                                                #print(ww[i:i+a+b+1]) 
                                                 i=i+a+b 
                                                 negperfcnt+=a+b
                                                 BOOl=False
                                                 break 
                                             
-                                        elif "" in negperfdict[ww[i].lower()]:
-                                            if ww[i+b] in amplifier:
+                                        elif "." in negperfdict[ww[i].lower()]:
+                                            if ww[i+b] in amplifierset:
                                                 posperfcnt+=sum([a,b])
-                                                print(ww[i:i+b+a]+1) 
+                                                #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
-                                            if ww[i+b] in negator:
+                                            if ww[i+b] in negatorset:
                                                 negperfcnt+=sum([a,b])
-                                                print(ww[i:i+b+a]+1) 
+                                                #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
@@ -623,29 +757,32 @@ def searchwords():
                 
             
                     positiveperformancesent.append(posperfcnt)
-                    posperfcnt=0
                     negativeperformancesent.append(negperfcnt)
-
+                    posperfcnt=0
+                    negperfcnt=0
+                    
                     sentlen.append(len(ww))
 
                 else:
                     sentno-=1   
 
-                if DEBUG:
-                    if filenum==1000:
-                        break 
+            if DEBUG:
+                if filenum==10000:
+                    break 
                         
                         
-    print(filename)  
-    print(len(sentnolist))           
-    print(len(posperflist))    
-    print(len(sentlen))
+   # print(filename)  
+   # print(len(sentnolist))           
+   # print(len(posperflist))    
+   # print(len(sentlen))
 
 
     p=zip(filename,sentnolist,positiveperformancesent,negativeperformancesent,sentlen)
     for row in p:
         #print(row)
         wr.writerow(row)
+    print(len(f1))
+    return f1
 
 
             
@@ -690,12 +827,13 @@ yearlist=[]
 ciklist=[]
 llist=[] 
 
+#print(len(f1))
 
-
-def finalcount(): 
+def finalcount(f1): 
     global a 
     a=0 
-    searchwords()
+    f1=searchwords()
+    print(len(f1))
     f_out2 = open(csv2, 'w')
     wr2 = csv.writer(f_out2)
     pos=0
@@ -739,11 +877,11 @@ def finalcount():
                 l=0
 
 
-            if int(row[2])!=0: 
+            if row[2].isdigit():
                 pos+=int(row[2])
-            if int(row[3])!=0: 
+            if row[3].isdigit(): 
                 neg+=int(row[3])
-            if int(row[4])!=0: 
+            if row[4].isdigit():
                 l+=int(row[4])
             """
             if "1" in row[2] and "1" in row[4]: 
@@ -758,9 +896,9 @@ def finalcount():
             """ 
 
             
-    p=zip(filenamelist,yearlist,ciklist,poslist,neglist,llist,f) 
+    p=zip(filenamelist,yearlist,ciklist,poslist,neglist,llist) 
     wr2.writerow(["filename","year","cik","pos","neg","l","filedate"])
     for row in p:
         wr2.writerow(row)
 
-finalcount()
+finalcount(f1)
