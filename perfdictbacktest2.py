@@ -53,7 +53,9 @@ negator="/Users/lucy/Desktop/assortedcodes/builddic/negatorfinal.csv"
 amplifier="/Users/lucy/Desktop/assortedcodes/builddic/amplifiedfinal.csv"
 negative="/Users/lucy/Desktop/assortedcodes/builddic/negativeperf.csv"
 positive="/Users/lucy/Desktop/assortedcodes/builddic/positiveperfcsv.csv"
+bad="/Users/lucy/Desktop/assortedcodes/builddic/bad.csv"
 os.chdir("/Users/lucy/Desktop/assortedcodes/builddic") 
+
 
 ##########################################################################################################################################
 
@@ -64,6 +66,7 @@ posperdict=defaultdict(list)
 negperfdict=defaultdict(list)
 amplifierset=set()
 negatorset=set()
+badset=set()
 
 o=[]
 p=[]
@@ -109,6 +112,12 @@ def combine2():
                     #posperdict.update({w1:{w2:negator1}})
                     #posperdict.update({negator1:{w1:w2}})
 
+
+    with open(bad,"r") as badf: 
+        records1=csv.reader(badf)
+        for row in records1:
+            badf1=row[0].lower()
+            badset.add(badf1)
 
 
     with open(amplifier,"r") as ampfile: 
@@ -377,7 +386,7 @@ def searchwords():
     internaldict=defaultdict(list)
 
 
-    print(negperfdict)
+    #print(negperfdict)
 
     def merge(list1, list2): 
         merged_list = [(list1[i], list2[i]) for i in range(0, len(list1))] 
@@ -556,11 +565,12 @@ def searchwords():
                                                 
                                           
                                             if ww[i+a+b] in negperfdict[ww[i+b]]: 
-                                                # print(ww[i:i+a+b+1])
-                                                # print(ww[i])
-                                                # print(ww[i+b)
-                                                # print(ww[i+a+b])
-                                                negperfcnt+=sum([a,b])
+                                                print(ww[i:i+a+b+1])
+                                                print(ww[i])
+                                                print(ww[i+b])
+                                                print(ww[i+a+b])
+                                                print("positive")
+                                                posperfcnt+=sum([a,b])
                                                 i=i+a+b 
                                                 BOOl=False
                                                 break 
@@ -582,7 +592,7 @@ def searchwords():
                                                 # print(ww[i])
                                                 # print(ww[i+b)
                                                 # print(ww[i+a+b])
-                                                posperfcnt+=sum([a,b])
+                                                negperfcnt+=sum([a,b])
                                                 i=i+a+b 
                                                 BOOl=False
                                                 break 
@@ -592,7 +602,7 @@ def searchwords():
                                                 #print(ww[i])
                                                 # print(ww[i+b])
                                                 # print(ww[i+a+b])
-                                                posperfcnt+=b
+                                                negperfcnt+=b
                                                 i=i+b
                                                 BOOl=False
                                                 break
@@ -653,7 +663,52 @@ def searchwords():
                                                 BOOL=False
                                                 break
                                         
+                                    elif ww[i].lower() in badset and i+a+b<len(ww): 
+                                        if posperdict.get(ww[i+b]):
+                                            # if c(i,a,b,ww,posperdict,posperfcnt,BOOL) is not None: 
+                                            #     posperfcnt,BOOL,i=c(i,a,b,ww,posperdict,posperfcnt,BOOL)
+                                            #     break
 
+                                           
+                                            #if negperfdict[ww[i+b]] is not None:
+                                            if ww[i+a+b] in posperdict[ww[i+b]]: 
+                                                    # print(ww[i:i+a+b+1])
+                                                    # print(ww[i])
+                                                    # print(ww[i+b])
+                                                    # print(ww[i+a+b])                                                    
+                                                negperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break
+
+                                            elif "." in posperdict[ww[i+b]]:
+                                                negperfcnt+=b                                         
+                                                i=i+b
+                                                BOOl=False
+                                                break
+                                            
+                                            
+                                            # elif c(i,a,b,ww,negperfdict,negperfcnt,BOOL) is not None: 
+                                            #     negperfcnt,BOOL,i=c(i,a,b,ww,negperfdict,negperfcnt,BOOL)
+                                            #     break
+
+                                        if negperfdict.get(ww[i+b]):  
+                                            if ww[i+a+b] in negperfdict[ww[i+b]]: 
+                                                # print(ww[i:i+a+b+1])
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                negperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in negperfdict[ww[i+b]]: 
+                                                negperfcnt+=b 
+                                                i=i+b
+                                                BOOL=False
+                                                break
+                                        
                     
                                             # else:
                                             #     #print(ww[i:i+b+a+1])   
@@ -697,6 +752,16 @@ def searchwords():
                                                 posperfcnt+=a+b
                                                 BOOl=False
                                                 break 
+
+                                            elif ww[i+a+b] in badset: 
+                                                # print(ww[i:i+a+b+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                i=i+a+b 
+                                                negperfcnt+=a+b
+                                                BOOl=False
+                                                break 
                                       
 
                                         #elif b(i,a,b,ww,negatorset,posperfcnt,BOOL):
@@ -712,6 +777,15 @@ def searchwords():
                                                 BOOl=False
                                                 break
                                             if ww[i+b] in negatorset:
+                                                posperfcnt+=sum([b,a])
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                # print(ww[i:i+b+a+1]) 
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in badset:
                                                 posperfcnt+=sum([b,a])
                                                 # print(ww[i])
                                                 # print(ww[i+b])
@@ -739,15 +813,27 @@ def searchwords():
                                                 negperfcnt+=a+b
                                                 BOOl=False
                                                 break 
+                                            elif ww[i+a+b] in badset: 
+                                                #print(ww[i:i+a+b+1]) 
+                                                i=i+a+b 
+                                                negperfcnt+=a+b
+                                                BOOl=False
+                                                break 
                                             
                                         elif "." in negperfdict[ww[i].lower()]:
                                             if ww[i+b] in amplifierset:
-                                                posperfcnt+=sum([a,b])
+                                                negperfcnt+=sum([a,b])
                                                 #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
                                             if ww[i+b] in negatorset:
+                                                posperfcnt+=sum([a,b])
+                                                #print(ww[i:i+b+a+1]) 
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in badset:
                                                 negperfcnt+=sum([a,b])
                                                 #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
