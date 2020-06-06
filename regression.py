@@ -19,10 +19,11 @@ item2="FILER"
 item3="COMPANY CONFORMED NAME:"
 item=item.lower()
 
-dfin="/Users/lucy/Desktop/assortedcodes/91e17c1ef257fb31.csv"
+dfin="/Users/lucy/Desktop/assortedcodes/91e17c1ef257fb31.csv" # for ROA data 
+dfin2=""
 
 
-d={}
+d=defaultdict(list)
 with open(dfin,"r") as posfile: 
     #print("u")
     records=csv.reader(posfile)
@@ -56,6 +57,18 @@ with open(dfin,"r") as posfile:
        # i+=1
 
     posfile.close()
+
+
+with open(dfin,"r") as posfile: 
+    #print("u")
+    records=csv.reader(posfile)
+    i=0
+    for row in records:
+        if i==0: 
+            i+=1
+            continue
+        cik=row[12]
+
 
 print(d)
 

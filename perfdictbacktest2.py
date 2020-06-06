@@ -513,6 +513,7 @@ def searchwords():
             sent = re.split('(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)(\s|[A-Z].*)',content)
             posperfcnt=0 
             negperfcnt=0
+            doubleneg=0
             
             sentno=0
             for sentences in sent: # ISSUE: need to identify individual words, modify to match regex words
@@ -569,7 +570,6 @@ def searchwords():
                                                 print(ww[i])
                                                 print(ww[i+b])
                                                 print(ww[i+a+b])
-                                                print("positive")
                                                 posperfcnt+=sum([a,b])
                                                 i=i+a+b 
                                                 BOOl=False
