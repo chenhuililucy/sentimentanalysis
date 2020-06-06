@@ -6,10 +6,18 @@ library(estimatr)
 library(margins)
 library(car)
 summary(regression1)
-reg = lm_robust(as.double(log(roa)) ~ as.double(posl)+as.double(negl)+as.double(spreturns), data = regression3)
+reg = lm_robust(as.double(log(roa)) ~ as.double(posl)+ as.double(negneg)+as.double(negl)+as.double(spreturns), data = finalregression)
 summary(reg)
-linearHypothesis(reg, c("as.double(posl)"), test = "F")
 linearHypothesis(reg, c("as.double(negl)"), test = "F")
+linearHypothesis(reg, c("as.double(posl)"), test = "F")
+linearHypothesis(reg, c("as.double(negneg)"), test = "F")
+linearHypothesis(reg, c("as.double(spreturns)"), test = "F")
+
+
+finalregression$dum=finalregression$negneg+finalregression$posl
+reg = lm_robust(as.double(log(roa)) ~ as.double(dum)+as.double(negl)+as.double(spreturns), data = finalregression)
+
+
 #linearHypothesis(reg, c("as.double(posl)"), test = "F")
 
 
