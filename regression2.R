@@ -6,16 +6,65 @@ library(estimatr)
 library(margins)
 library(car)
 summary(regression1)
-reg = lm_robust(as.double(log(roa)) ~ as.double(posl)+ as.double(negneg)+as.double(negl)+as.double(spreturns), data = finalregression)
+
+reg = lm_robust(as.double(roa) ~ as.double(posl)+ as.double(negneg)+as.double(negl)+as.double(spreturns), data = finalregression)
 summary(reg)
 linearHypothesis(reg, c("as.double(negl)"), test = "F")
 linearHypothesis(reg, c("as.double(posl)"), test = "F")
 linearHypothesis(reg, c("as.double(negneg)"), test = "F")
 linearHypothesis(reg, c("as.double(spreturns)"), test = "F")
 
+finalregression$sign=ifelse(finalregression$roa>0,1,-1)
+reg = lm_robust(as.double(sign*log(1+abs(as.double(roa)))) ~ as.double(posl)+ as.double(negneg)+as.double(negl)+as.double(spreturns), data = finalregression)
+summary(reg)
+linearHypothesis(reg, c("as.double(negl)"), test = "F")
+linearHypothesis(reg, c("as.double(posl)"), test = "F")
+linearHypothesis(reg, c("as.double(negneg)"), test = "F")
+linearHypothesis(reg, c("as.double(spreturns)"), test = "F")
+
+`vectorfinal(3)`$ratio=(`vectorfinal(3)`$roa-`vectorfinal(3)`$roalag)/(`vectorfinal(3)`$roalag)
+`vectorfinal(3)`$ratio1=(`vectorfinal(3)`$roa)/(`vectorfinal(3)`$roalag)
+
+`vectorfinal(3)`$sign=ifelse(`vectorfinal(3)`$ratio>0,1,-1)
+`vectorfinal(3)`$posneg=as.double(`vectorfinal(3)`$posl)/as.double(`vectorfinal(3)`$negl+0.0001)
+
+reg = lm_robust(as.double(sign*log(1+abs(as.double(ratio)))) ~ as.double(posl)+as.double(negl), data = `vectorfinal(3)`)
+summary(reg)
+
+`vectorfinal(3)`[!apply(`vectorfinal(3)` == "", 1, all),]
+
+reg1 = lm_robust(as.double(sign*log(1+abs(as.double(ratio)))) ~ (as.double(posneg)), data = `vectorfinal(3)`)
+summary(reg1)
+linearHypothesis(reg, c("as.double(negl)"), test = "F")
+linearHypothesis(reg, c("as.double(posl)"), test = "F")
+linearHypothesis(reg, c("as.double(negneg)"), test = "F")
+linearHypothesis(reg, c("as.double(spreturns)"), test = "F")
+
+
+reg = lm_robust(as.double(log(roa)) ~ as.double(posl)+ as.double(negneg)+as.double(negl)+as.double(spreturns), data = finalregression)
+
+
+Itun[ , colSums(is.na(Itun)) == 0]
+
+
+#negl stands for external % of words in file 
+#internall stands for internal % of words in file 
+reg = lm_robust(as.double(log((roa))) ~ as.double(internall)+as.double(negl)+as.double(spreturns), data = regressionintext)
+summary(reg)
+linearHypothesis(reg, c("as.double(negl)"), test = "F")
+linearHypothesis(reg, c("as.double(internall)"), test = "F")
+
+
+                
 
 finalregression$dum=finalregression$negneg+finalregression$posl
 reg = lm_robust(as.double(log(roa)) ~ as.double(dum)+as.double(negl)+as.double(spreturns), data = finalregression)
+summary(reg)
+linearHypothesis(reg, c("as.double(dum)"), test = "F")
+
+linearHypothesis(reg, c("as.double(negl)"), test = "F")
+linearHypothesis(reg, c("as.double(spreturns)"), test = "F")
+
 
 
 #linearHypothesis(reg, c("as.double(posl)"), test = "F")

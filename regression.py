@@ -81,6 +81,8 @@ l5=[]
 l6=[]
 l7=[]
 l8=[]
+l9=[]
+
 
 with open(dir2,"r") as posfile: 
     records=csv.reader(posfile)
@@ -102,6 +104,14 @@ with open(dir2,"r") as posfile:
             l7.append(ROA)
         else: 
             l7.append(".")
+        if year.isdigit():
+            year1=int(year)-1
+        if d.get((cik,str(year1))):
+            ROA2=d[(cik,str(year1))]
+            l8.append(ROA2)
+        else: 
+            l8.append(".")
+        
 
         s.update({(cikoriginal,year):i-2})
         
@@ -156,13 +166,22 @@ for root, dirs, files in os.walk("/Users/lucy/Desktop/others/allfiles"):
 
 print(f)
 
+l10=[]
+i=0
+while i<len(l8):
+    if l7[i]!="." and l8[i]!=".":
+        diff=l7[i]-l8[i]
+        l10.append(diff/l8[i])
+    else: 
+        l10.append(".")
+    i+=1
 
 
-z=zip(l1,l2,l3,l4,l5,l6,l7,f)
-csv2="/Users/lucy/Desktop/assortedcodes/vectorfinal.csv"
+z=zip(l1,l2,l3,l4,l5,l6,l7,l8,l10,f)
+csv2="/Users/lucy/Desktop/assortedcodes/vectorfinal(3).csv"
 f_out2 = open(csv2, 'w')
 wr2 = csv.writer(f_out2)
-wr2.writerow(["filename","year","cik","posl","negl","spreturns","roa","filedate"])
+wr2.writerow(["filename","year","cik","posl","negl","spreturns","roa","roat-1","ratioroa","filedate"])
 
 #wr2.writerow(["filename","year","cik","posint","negint","posextlist","negextlist","filingdate"])
 for i in z: 

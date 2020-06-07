@@ -6,11 +6,47 @@ library(estimatr)
 library(margins)
 library(car)
 summary(regression1)
-reg = lm_robust(as.double(spreturns) ~ as.double(posl)+ as.double(negl), data = regression1)
+reg = lm_robust(as.double(log(roa)) ~ as.double(posl)+as.double(negl)+as.double(spreturns), data = regression3)
+summary(reg)
+linearHypothesis(reg, c("as.double(posl)"), test = "F")
+linearHypothesis(reg, c("as.double(negl)"), test = "F")
+#linearHypothesis(reg, c("as.double(posl)"), test = "F")
+
+
+`vectorfinal(3)`$posneg=`vectorfinal(3)`$posl/(`vectorfinal(3)`$negl)
+
+
+
+`vectorfinal(3)`$ratio=(as.double(`vectorfinal(3)`$roa)-as.double(`vectorfinal(3)`$roalag))
+#reg = lm_robust(as.double(log((ratio))) ~ as.double(posneg)+as.double(spreturns), data = `vectorfinal(3)`)
+
+`vectorfinal(3)`$ratio1=(as.double(`vectorfinal(3)`$roa)-as.double(`vectorfinal(3)`$roalag))
+
+reg=lm_robust(as.double((100*roa)) ~ as.double(posneg) + as.double(spreturns), data = `vectorfinal(3)`)
+
+summary(reg)
+linearHypothesis(reg, c("as.double(posl)"), test = "F")
+linearHypothesis(reg, c("as.double(negl)"), test = "F")
+#linearHypothesis(reg, c("as.double(posl)"), test = "F")
+
+
+
+
+#as.double(posl)+ as.double(negl)+
+linearHypothesis(reg, c("as.double(posl)"), test = "F")
+linearHypothesis(reg, c("as.double(negl)"), test = "F")
+
+
+
+reg = lm_robust(as.double(spreturns) ~ as.double(posl)), data = regression3)
 summary(reg)
 linearHypothesis(reg, c("as.double(posl)"), test = "F")
 
-reg1 = lm_robust(as.double(negl) ~ as.double(spreturns), data = regression1)
+reg = lm_robust(as.double(spreturns) ~ as.double(negl), data = regression3)
+summary(reg)
+linearHypothesis(reg, c("as.double(negl)"), test = "F")
+
+reg1 = lm_robust(as.double(negl) ~ as.double(spreturns), data = regression2)
 summary(reg1)
 linearHypothesis(reg1, c("as.double(spreturns)"), test = "F")
 
@@ -48,7 +84,6 @@ as.double(negl)    49.48    11.6222   4.257 2.086e-05    26.70   72.264 9995
 
 Multiple R-squared:  0.002076 ,	Adjusted R-squared:  0.001876 
 F-statistic: 9.094 on 2 and 9995 DF,  p-value: 0.0001133
-> linearHypothesis(reg, c("as.double(posl)"), test = "F")
 Linear hypothesis test
 
 Hypothesis:
@@ -78,7 +113,6 @@ as.double(spreturns) 3.753e-05  9.843e-06   3.813 0.0001381 1.824e-05 5.682e-05 
 
 Multiple R-squared:  0.001509 ,	Adjusted R-squared:  0.001409 
 F-statistic: 14.54 on 1 and 9996 DF,  p-value: 0.0001381
-# linearHypothesis(reg1, c("as.double(spreturns)"), test = "F")
 Linear hypothesis test
 
 Hypothesis:
