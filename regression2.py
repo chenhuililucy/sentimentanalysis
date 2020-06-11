@@ -54,13 +54,15 @@ with open(dfin,"r") as posfile:
             float(at)
             if float(at)!=0:
                 ROA=float(ni)/float(at)
-                for e in d2[(cik,datadate)]:
-                    if e==ROA: 
-                        d=True 
 
-                if not d:
-                    d2[(cik,datadate)].append(ROA)
-                    d=False
+                d2.update({(cik,datadate):[ROA]})
+                # for e in d2[(cik,datadate)]:
+                #     if e==ROA: 
+                #         d=True 
+
+                # if not d:
+                #     d2[(cik,datadate)].append(ROA)
+                #     d=False
                 #d.update({(cik,datadate):[ROA]})
         except ValueError:
             print ("Not a float")
@@ -105,8 +107,7 @@ with open("/Users/lucy/Desktop/assortedcodes/dfb333d6ddf9d922.csv","r") as posfi
             mkvalt=row[13]
         else: 
             mkvalt="."
-        if epspi not in d1[(cik,datadate)]:
-            d1[(cik,datadate)].extend([epspi,epspx,mkvalt])
+        d1[(cik,datadate)].extend([epspi,epspx,mkvalt])
     posfile.close()
 
 
@@ -202,22 +203,24 @@ with open(dir2,"r") as posfile:
             cik="0"*p+cikoriginal
 
 
-        if year.isdigit():
+        try:
             year2=int(year)+1
             year1=int(year)-1
+        except ValueError: 
+            print(year)
 
         if d2.get((cik,year)):
             roa=d2[(cik,year)][0]
             l7.append(roa)
         else: 
             l7.append(".")
-        if d2.get((cik,year1)):
-            roa1=d2[(cik,year1)][0]
+        if d2.get((cik,str(year1))):
+            roa1=d2[(cik,str(year1))][0]
             l9.append(roa1)
         else: 
             l9.append(".")
-        if d2.get((cik,year2)):
-            roa2=d2[(cik,year2)][0]
+        if d2.get((cik,str(year2))):
+            roa2=d2[(cik,str(year2))][0]
             l11.append(roa2)
         else: 
             l11.append(".")
@@ -282,17 +285,17 @@ with open(dir2,"r") as posfile:
 
 
         if d1.get((cik,year)):
-            epspx=d1[(cik,year)][2]
-            l14.append(epspx)
+            epspx=d1[(cik,year)][1]
+            l15.append(epspx)
         else: 
-            l14.append(".")
+            l15.append(".")
 
         if d1.get((cik,year)):
 
             mkvalt=d1[(cik,year)][2]
-            l14.append(mkvalt)
+            l16.append(mkvalt)
         else: 
-            l14.append(".")
+            l16.append(".")
 
         #     if len(d[(cik,year)])==4 or len(d[(cik,year)])==8:
         #         epspi=d[(cik,year)][1]
@@ -436,7 +439,7 @@ with open(dir2,"r") as posfile:
         l4.append(float(row[3])/float(row[6]))
         l5.append(float(row[4])/float(row[6]))
         if float(row[4])!=0:
-            l13.append(float(row[3])+float(row[5])/float(row[4]))
+            l13.append((float(row[3])+float(row[5]))/float(row[4]))
         else: 
             l13.append(".")
         l6.append(".")
@@ -488,13 +491,64 @@ for root, dirs, files in os.walk("/Users/lucy/Desktop/others/allfiles"):
 print(f)
 
 
+from datetime import timedelta, date
+from datetime import date
 
-z=zip(l1,l2,l3,l4,l5,l8,l6,l7,l9,l11,l12,l13,l14,l15,l16,l17,l18,l19,l20,f)
-csv2="/Users/lucy/Desktop/assortedcodes/vectorfinal(7).csv"
+
+
+d=defaultdict(list)
+pop=[0]*len(f)
+l=[0]*len(f)
+index=0
+for i in zip(l3,f):
+    cik,date=i
+    #date=str(date)
+    mind=datetime.date(date[:5],date[5:7],date[7:9])-timedelta(days=252)
+    maxd=datetime.date(date[:5],date[5:7],date[7:9])-timedelta(days=6)
+    d[cik].append([index,date,mind,maxd])
+
+with open("/Users/lucy/Desktop/assortedcodes/31b3605da3e00c98.csv","r") as posfile: 
+    records=csv.reader(posfile)
+    i=0
+    for row in records:
+        if i==0: 
+            i+=1 
+            continue
+        if row[12] in d: 
+            for e in d[row[12]]:
+                if e[2]<datetime.date(row[9][:5],row[9][5:7],row[9][7:9]) and e[3]>datetime.date(row[9][:5],row[9][5:7],row[9][7:9]):
+                    pop[int(e[0])]+=int(row[11])
+                    l+=1
+
+    posfile.close()
+
+finpop=[] 
+finitem=[]
+for item in zip(pop,l): 
+    popitem, litem= item 
+    if int(litem)<60: 
+        popitem="."
+        litem="."
+        finpop.append(popitem)
+        #finitem.append(litem)
+    else: 
+        finpop.append(popitem)
+        #finitem.append(litem)
+
+    #row[9]
+
+
+    #int(date[:5])*365+int(date[5:7])*
+
+
+
+
+z=zip(l1,l2,l3,l4,l5,l8,l6,l7,l9,l11,l12,l13,l14,l15,l16,l17,l18,l19,l20,f,finpop)
+csv2="/Users/lucy/Desktop/assortedcodes/vectorfinal(9).csv"
 f_out2 = open(csv2, 'w')
 wr2 = csv.writer(f_out2)
 #wr2.writerow(["filename","year","cik","posl","negl","negneg","spreturns","roa","filedate"])
-wr2.writerow(["filename","year","cik","posl","negl","negneg","spreturns","roa","roat-1","roat+1","length","percwrds","epspi","epspx","mkvalt","prcc","csho","ceq","gic","filedate"])
+wr2.writerow(["filename","year","cik","posl","negl","negneg","spreturns","roa","roat-1","roat+1","length","percwrds","epspi","epspx","mkvalt","prcc","csho","ceq","gic","filedate","shareturnover"])
 
 #wr2.writerow(["filename","year","cik","posint","negint","posextlist","negextlist","filingdate"])
 for i in z: 
