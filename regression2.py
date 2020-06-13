@@ -490,9 +490,10 @@ for root, dirs, files in os.walk("/Users/lucy/Desktop/others/allfiles"):
 
 print(f)
 
-
+import datetime
 from datetime import timedelta, date
 from datetime import date
+from datetime import timedelta
 
 
 
@@ -502,9 +503,21 @@ l=[0]*len(f)
 index=0
 for i in zip(l3,f):
     cik,date=i
-    #date=str(date)
-    mind=datetime.date(date[:5],date[5:7],date[7:9])-timedelta(days=252)
-    maxd=datetime.date(date[:5],date[5:7],date[7:9])-timedelta(days=6)
+    date=str(date).strip()
+
+    if date[:4] is not None or date[4:6] is not None or date[6:8] is not None:
+        try:
+            mind=datetime.date(int(date[:4]),int(date[4:6]),int(date[6:8]))-timedelta(days=252)
+            maxd=datetime.date(int(date[:4]),int(date[4:6]),int(date[6:8]))-timedelta(days=6)
+
+        except ValueError: 
+            mind="."
+            maxd="."
+            print(date[:4])
+            print(date[4:6])
+            print(date[6:8])
+        
+    #maxd=datetime.date(int(date[:4]),int(date[4:6]),int(date[6:8]))-timedelta(days=6)
     d[cik].append([index,date,mind,maxd])
 
 with open("/Users/lucy/Desktop/assortedcodes/31b3605da3e00c98.csv","r") as posfile: 
@@ -515,10 +528,13 @@ with open("/Users/lucy/Desktop/assortedcodes/31b3605da3e00c98.csv","r") as posfi
             i+=1 
             continue
         if row[12] in d: 
+            
             for e in d[row[12]]:
-                if e[2]<datetime.date(row[9][:5],row[9][5:7],row[9][7:9]) and e[3]>datetime.date(row[9][:5],row[9][5:7],row[9][7:9]):
+                if e[2]<datetime.date(int(row[9][:4]),int(row[9][4:6]),int(row[9][6:8])) and e[3]>datetime.date(int(row[9][:4]),int(row[9][4:6]),int(row[9][6:8])):
                     pop[int(e[0])]+=int(row[11])
-                    l+=1
+                    l[int(e[0])]+=int(1)
+                    print(cik)
+                    print(l)
 
     posfile.close()
 
@@ -544,7 +560,7 @@ for item in zip(pop,l):
 
 
 z=zip(l1,l2,l3,l4,l5,l8,l6,l7,l9,l11,l12,l13,l14,l15,l16,l17,l18,l19,l20,f,finpop)
-csv2="/Users/lucy/Desktop/assortedcodes/vectorfinal(9).csv"
+csv2="/Users/lucy/Desktop/assortedcodes/vectorfinal(10).csv"
 f_out2 = open(csv2, 'w')
 wr2 = csv.writer(f_out2)
 #wr2.writerow(["filename","year","cik","posl","negl","negneg","spreturns","roa","filedate"])
