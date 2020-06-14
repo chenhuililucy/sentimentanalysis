@@ -182,6 +182,8 @@ l17=[]
 l18=[]
 l19=[]
 l20=[]
+li=[]
+lo=[]
 
 with open(dir2,"r") as posfile: 
     records=csv.reader(posfile)
@@ -225,56 +227,7 @@ with open(dir2,"r") as posfile:
         else: 
             l11.append(".")
 
-        
 
-        # if d.get((cik,year)):
-        #     if len(d[(cik,year)])==1 or len(d[(cik,year)])==4 or len(d[(cik,year)])==5 or len(d[(cik,year)])==8:
-        #         if d[(cik,year)][0]:
-
-        #             ROA=d[(cik,year)][0]
-        #             l7.append(ROA)
-        #         else:
-        #             l7.append(".")
-        #     else: 
-        #         l7.append(".")
-        # else: 
-        #     l7.append(".")
-
-
-        # if year.isdigit():
-        #     year2=int(year)+1
-        #     year1=int(year)-1
-
-        # if d.get((cik,str(year1))):
-        #     if len(d[(cik,year1)])==1 or len(d[(cik,year1)])==4 or len(d[(cik,year1)])==5 or len(d[(cik,year1)])==8:
-        #         if d[(cik,year1)][0]:
-
-        #             ROA1=d[(cik,year1)][0]
-        #             l9.append(ROA1)
-        #         else:
-        #             l9.append(".")
-        #     else: 
-        #         l9.append(".")
-        # else: 
-        #     l9.append(".")
-
-
-        # if d.get((cik,str(year2))):
-        #     if len(d[(cik,year2)])==1 or len(d[(cik,year2)])==4 or len(d[(cik,year2)])==5 or len(d[(cik,year2)])==8:
-        #         if d[(cik,year2)][0]:
-
-        #             ROA2=d[(cik,year2)][0]
-        #             l11.append(ROA2)
-        #         else:
-        #             l11.append(".")
-        #     else: 
-        #         l11.append(".")
-        # else: 
-        #     l11.append(".")
-
-
-
-#
         if d1.get((cik,year)):
 
             epspi=d1[(cik,year)][0]
@@ -296,55 +249,6 @@ with open(dir2,"r") as posfile:
             l16.append(mkvalt)
         else: 
             l16.append(".")
-
-        #     if len(d[(cik,year)])==4 or len(d[(cik,year)])==8:
-        #         epspi=d[(cik,year)][1]
-        #         l14.append(epspi)
-        #     elif len(d[(cik,year)])==7:
-        #         epspi=d[(cik,year)][0]
-        #         l14.append(epspi)
-        #     elif len(d[(cik,year)])==3:
-        #         epspi=d[(cik,year)][0]
-        #         l14.append(epspi)
-        #     else:
-        #         l14.append(".")
-        # else: 
-        #     l14.append(".")
-
-#
-
-        # if d.get((cik,year)):
-        #     if len(d[(cik,year)])==4 or len(d[(cik,year)])==8:
-        #         epspx=d[(cik,year)][2]
-        #         l15.append(epspx)
-        #     elif len(d[(cik,year)])==7:
-        #         epspx=d[(cik,year)][1]
-        #         l15.append(epspx)
-        #     elif len(d[(cik,year)])==3:
-        #         epspx=d[(cik,year)][1]
-        #         l15.append(epspx)
-        #     else: 
-        #         l15.append(".")
-
-        # else: 
-        #     l15.append(".")
-
-
-        # if d.get((cik,year)):
-        #     if len(d[(cik,year)])==4 or len(d[(cik,year)])==8:
-        #         mkvalt=d[(cik,year)][3]
-        #         l16.append(mkvalt)
-        #     elif len(d[(cik,year)])==7:
-        #         mkvalt=d[(cik,year)][2]
-        #         l16.append(mkvalt)
-        #     elif len(d[(cik,year)])==3:
-        #         mkvalt=d[(cik,year)][2]
-        #         l16.append(mkvalt)
-        #     else: 
-        #         l16.append(".")
-        # else: 
-        #     l16.append(".")
-
 
 #
         if d.get((cik,year)):
@@ -430,14 +334,17 @@ with open(dir2,"r") as posfile:
             
         s.update({(cikoriginal,year):i-2})
         directory=row[0]
-        l1.append(row[0])
+        l1.append(row[0]) # filename 
         year=row[1]
-        l2.append(row[1])
+        l2.append(row[1]) # year
         cik=row[2]
 
-        l3.append(row[2])
-        l4.append(float(row[3])/float(row[6]))
-        l5.append(float(row[4])/float(row[6]))
+        l3.append(row[2]) # cik
+        l4.append(float(row[3])/float(row[8])) # posint/l
+        l5.append(float(row[4])/float(row[8])) # posext/l
+        lo.append(float(row[5])/float(row[8])) # negint/l
+        li.append(float(row[5])/float(row[8])) # negext/l
+
         if float(row[4])!=0:
             l13.append((float(row[3])+float(row[5]))/float(row[4]))
         else: 
@@ -572,7 +479,7 @@ for item in zip(pop,l):
 
 
 
-z=zip(l1,l2,l3,l4,l5,l8,l6,l7,l9,l11,l12,l13,l14,l15,l16,l17,l18,l19,l20,f,finpop)
+z=zip(l1,l2,l3,l4,l5,lo,li,l8,l6,l7,l9,l11,l12,l13,l14,l15,l16,l17,l18,l19,l20,f,finpop)
 csv2="/Users/lucy/Desktop/assortedcodes/vectorfinal(10).csv"
 f_out2 = open(csv2, 'w')
 wr2 = csv.writer(f_out2)

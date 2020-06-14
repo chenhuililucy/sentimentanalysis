@@ -21,6 +21,11 @@ negperflist.csv --------   csv with  amplifier & negator adjusted negative perfo
 
 '''
 
+corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
+csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(11).csv"
+csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(11).csv"
+
+
 
 #############################  MAIN  #########################################################################################
 
@@ -38,9 +43,6 @@ from collections import defaultdict
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.tokenize import RegexpTokenizer
 
-corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
-csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(11).csv"
-csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(11).csv"
 
 from nltk import ngrams
 
@@ -257,6 +259,7 @@ direct="/Users/lucy/Desktop/assortedcodes/assortedcodes/examplesentences(1).txt"
 
 
 
+f1=[]
 
                    ###################
 def searchwords(): 
@@ -369,11 +372,6 @@ def searchwords():
             #print(externalwordlist)
 
 
-
-    corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
-    csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLM(1).csv"
-    csv2="/Users/lucy/Desktop//assortedcodes/builddic/vector(2).csv"
-
     externalsent=[]
     internalsent=[]
     posperfsent=[]
@@ -385,8 +383,8 @@ def searchwords():
     sentlist=[]
     sentlen=[]
 
-    sentlog_outputfields=["filename","sentnolist","positiveperformancesent","negativeperformancesent","sentlen"]
-
+    sentlog_outputfields=["filename","sentnolist","positiveperformancesent","negativeperformancesent","internalsent","externalsent"]
+    item="FILED AS OF DATE:"
     filenum=1 #correct as filenum 
 
     f_out=open(csv1,"w")
@@ -399,12 +397,35 @@ def searchwords():
         year=files[files.find("-")+1:files.find(".")]
         cik=files[:files.find("-")]
         with open(files) as f: 
-            totalnumberofsent=0
-            filenum=filenum+1 
             content = f.read()
             text1=content.lower()
+            matchedstring=""
+            for m in re.finditer(item.lower(), text1): 
+                if not m: 
+                    matchedstring="."
+                    raise Error
+                    #print(file)
+                else:
+                    substr1=text[m.start():m.start()+30]
+                    #print(substr1)
+                    # may be necessary to search for end string  
+                    i=0
+                    while i< len(substr1) and not substr1[i].isdigit(): 
+                        i+=1
+                    while i< len(substr1) and substr1[i].isdigit(): 
+                        matchedstring+=substr1[i]
+                        i+=1
+                    break
+            if matchedstring:
+                #print(matchedstring)
+                f1.append(matchedstring.strip())
+
+            totalnumberofsent=0
+            filenum=filenum+1 
+
             re.sub("\n","",content)
             sent = re.split('(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)(\s|[A-Z].*)',content)
+            #print(sent)
             posperfcnt=0 
             negperfcnt=0
             doubleneg=0
@@ -413,14 +434,15 @@ def searchwords():
             for sentences in sent: # ISSUE: need to identify individual words, modify to match regex words
                 #print(sentences)
                 sentno+=1
-                sentences=preprocess(sentences)
+                totalnumberofsent+=1
+
+                #sentences=preprocess(sentences)
                 endext=True 
                 endint=True 
                 endpos=True 
                 endneg=True
                 endposperf=True 
                 endnegperf=True 
-                sentno+=1
                 #print(sentno)
                 #ww=word_tokenize(sentences)
                 ww=[]
@@ -428,9 +450,11 @@ def searchwords():
                     if r.isalpha(): 
                         ww.append(r)
 
+                #print(ww)
                 #sentnolist.append(sentno)
                 if len(ww)>=1:
                     #print(ww)
+                    #sentno+=1
                     sentnolist.append(sentno)
                     if sentno==1: 
                         filename.append(files)
@@ -600,18 +624,20 @@ def searchwords():
                                                 break
                                             if ww[i+b] in negatorset:
                                                 posperfcnt+=sum([b,a])
-                                                endnegperf=False
+                                                endposperf=False
 
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
                                             if ww[i+b] in badset:
-                                                posperfcnt+=sum([b,a])
+                                                negperfcnt+=sum([b,a])
                                                 print(ww[i])
                                                 print(ww[i+b])
                                                 print(ww[i+a+b])
                                                 print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
+                                                endnegperf=False
+
                                                 BOOl=False
                                                 break
                                             
@@ -624,6 +650,7 @@ def searchwords():
                                                 #print(ww[i:i+a+b+1]) 
                                                 i=i+a+b 
                                                 posperfcnt+=a+b
+                                                endposperf=False
                                                 BOOl=False
                                                 break 
                                             
@@ -631,12 +658,14 @@ def searchwords():
                                                 #print(ww[i:i+a+b+1]) 
                                                 i=i+a+b 
                                                 negperfcnt+=a+b
+                                                endnegperf=False
                                                 BOOl=False
                                                 break 
                                             elif ww[i+a+b] in badset: 
                                                 #print(ww[i:i+a+b+1]) 
                                                 i=i+a+b 
                                                 negperfcnt+=a+b
+                                                endnegperf=False
                                                 BOOl=False
                                                 break 
                                             
@@ -645,330 +674,122 @@ def searchwords():
                                                 negperfcnt+=sum([a,b])
                                                 #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
+                                                endnegperf=False
                                                 BOOl=False
                                                 break
                                             if ww[i+b] in negatorset:
                                                 posperfcnt+=sum([a,b])
                                                 #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
+                                                endnegperf=False
                                                 BOOl=False
                                                 break
                                             if ww[i+b] in badset:
                                                 negperfcnt+=sum([a,b])
                                                 #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
+                                                endnegperf=False
                                                 BOOl=False
                                                 break                                       
 
-                if endnegperf: 
-                    negativeperformance=0
-                    negativeperformancesent.append(negativeperformance)
-                else: 
-                    negativeperformance=1 
-                    negativeperformancesent.append(negativeperformance)
+                        i+=1                        
 
-                #if endposperfstring is not "": 
-                    #pass
-                    # 
-                    # print(endposperfstring)
-                    
+                    if endposperf: 
+                        positiveperformance=0
+                        positiveperformancesent.append(positiveperformance)
+                    else: 
+                        positiveperformance=1 
+                        positiveperformancesent.append(positiveperformance)
+
+                    if endnegperf: 
+                        negativeperformance=0
+                        negativeperformancesent.append(negativeperformance)
+                    else: 
+                        negativeperformance=1 
+                        negativeperformancesent.append(negativeperformance)
 
 
-##################################################################################################################################################################################################################
-
-                if endext: 
-                    endextstring=""
-                    for i in range(len(ww)-3): 
-                        if ww[i].lower() in externaldict:
-                            for el in externaldict[ww[i]]:
-                                if el!="": 
-                                    if el.lower()==ww[i+1]: 
-                                        endextstring+=ww[i]+" "
-                                        endextstring+=ww[i+1]+" "
+                    if endext: 
+                        endextstring=""
+                        for i in range(len(ww)-3): 
+                            if ww[i].lower() in externaldict:
+                                for el in externaldict[ww[i]]:
+                                    if el!="": 
+                                        if el.lower()==ww[i+1]: 
+                                            endextstring+=ww[i]+" "
+                                            endextstring+=ww[i+1]+" "
+                                            endext=False
+                                        if el.lower()==ww[i+2]: 
+                                            endextstring+=ww[i]+" "
+                                            endextstring+=ww[i+2]+" "
+                                            endext=False
+                                        if el.lower()==ww[i+3]: 
+                                            endextstring+=ww[i]+" "
+                                            endextstring+=ww[i+3]+" "
+                                            #print(internaldict[ww[i]])
+                                            endext=False
+                                    else: 
+                                        endextstring+=ww[i]
                                         endext=False
-                                    if el.lower()==ww[i+2]: 
-                                        endextstring+=ww[i]+" "
-                                        endextstring+=ww[i+2]+" "
-                                        endext=False
-                                    if el.lower()==ww[i+3]: 
-                                        endextstring+=ww[i]+" "
-                                        endextstring+=ww[i+3]+" "
-                                        #print(internaldict[ww[i]])
-                                        endext=False
-                                else: 
-                                    endextstring+=ww[i]
-                                    endext=False
 
-
-                """
-                    for item in externalwordlist :   
-                        item=" "+item+" "
-                        if len(item.strip().split(" "))>1: 
-                            if item.split(" ")[0] in sentences: 
-                                mini_string=sentences.find(item.split(" ")[0])+len(str(item.split(" ")))
-                                stringend=mini_string+12 
-                                if item.split(" ")[1] in sentences[mini_string:stringend]: 
-                                    endext=False      
-                                    #print(item)
-                    
-                        else: 
-                            if item in sentences: 
-                                endext=False      
-                """ 
-     
-                if endext:      
-                    external=0
-                    externalsent.append(external)
-
-                else: 
-                    external=1
-                    externalsent.append(external)
-                
-                #
-                if endint: 
-                    internalstring=""
-                    for i in range(len(ww)-3): 
-                        if ww[i].lower() in internaldict:
-                            a=ww[i].lower()
-                            for el in internaldict[ww[i]]:
-                                if el!="": 
-                                    if el.lower()==ww[i+1]: 
-                                        internalstring+=ww[i]+" "
-                                        internalstring+=ww[i+1]+" "
-                                        endint=False
-                                    if el.lower()==ww[i+2]: 
-                                        internalstring+=ww[i]+" "
-                                        internalstring+=ww[i+2]+" "
-                                        endint=False
-                                    if el.lower()==ww[i+3]: 
-                                        internalstring+=ww[i]+" "
-                                        internalstring+=ww[i+3]+" "
-                                        #print(externaldict[ww[i]])
-                                        endint=False
-                                else: 
-                                    internalstring+=ww[i]
-                                    endint=False
-
-
-                """
-                    for item in internalwordlist :   
-                        item=" "+item+" "
-                        if len(item.strip().split(" "))>1: 
-                            if item.split(" ")[0] in sentences: 
-                                mini_string=sentences.find(item.split(" ")[0])+len(str(item.split(" ")))
-                                stringend=mini_string+12 
-                                if item.split(" ")[1] in sentences[mini_string:stringend]: 
-                                    endint=False      
-
-
-                        else: 
-                            if item in sentences: 
-                                #print(item)
-                                endint=False    
-                """
-
-                if endint:      
-                    internal=0
-                    internalsent.append(internal)
-
-                else: 
-                    internal=1
-                    internalsent.append(internal)
-            
-                #
-                if endpos: 
-                    endposting=""
-                    for item in ww: 
-                        if item in posperflist: 
-                            endposting+=item
-                            endpos=False 
-                
-                    """
-                    for item in posperflist :   
-                        item=" "+item+" "
-                        if item in sentences: 
-                            #print(item)
-                            endpos=False      
-                    """    
-                if endpos:      
-                    positive=0
-                    posperfsent.append(positive)
-
-                else: 
-                    positive=1
-                    posperfsent.append(positive)
-            
-                #
-                if endneg: 
-                    endnegstring=""
-                    for item in ww: 
-                        if item in negextlist: 
-                            endnegstring+=item
-                            endneg=False 
-                    """
-                    for item in negperflist :  
-                        item=" "+item+" " 
-                        if item in sentences: 
-                            #print(item)
-                            endneg=False   
-
-                    """
-
-                if endneg:      
-                    negative=0
-                    negperfsent.append(negative)
-
-                else: 
-                    negative=1
-                    negperfsent.append(negative)        
         
-                # can definitely simplify this section: cuz senpai says so
+                    if endext:      
+                        external=0
+                        externalsent.append(external)
 
-
-                
-                """
-                Y=True
-                # Debug 14th of May
-                fsent.write(files)
-                sentno=int(sentno)
-                fsent.write(str(sentno))
-                if endnegperfstring is not "" and internal!=0:
+                    else: 
+                        external=1
+                        externalsent.append(external)
                     
-                    fsent.write("endnegperf, int \n")
-                    fsent.write(internalstring+"\n")
-                    fsent.write(endnegperfstring+"\n")
-                    fsent.write("\n")
-                    fsent.write(sentences + "\n"+ "\n")
+                    #
+                    if endint: 
+                        internalstring=""
+                        for i in range(len(ww)-3): 
+                            if ww[i].lower() in internaldict:
+                                a=ww[i].lower()
+                                for el in internaldict[ww[i]]:
+                                    if el!="": 
+                                        if el.lower()==ww[i+1]: 
+                                            internalstring+=ww[i]+" "
+                                            internalstring+=ww[i+1]+" "
+                                            endint=False
+                                        if el.lower()==ww[i+2]: 
+                                            internalstring+=ww[i]+" "
+                                            internalstring+=ww[i+2]+" "
+                                            endint=False
+                                        if el.lower()==ww[i+3]: 
+                                            internalstring+=ww[i]+" "
+                                            internalstring+=ww[i+3]+" "
+                                            #print(externaldict[ww[i]])
+                                            endint=False
+                                    else: 
+                                        internalstring+=ww[i]
+                                        endint=False
+
+
+
+                    if endint:      
+                        internal=0
+                        internalsent.append(internal)
+
+                    else: 
+                        internal=1
+                        internalsent.append(internal)
                     
-                elif endnegperfstring is not "": 
-                    fsent.write("negperf \n")
-                    fsent.write(endnegperfstring+"\n")
-                    fsent.write(sentences + "\n"+ "\n")
-                    Y=False 
+                    sentlen.append(len(ww))
+
+                else:
+                    sentno-=1
                     
-                if endnegperfstring is not "" and external!=0 : 
-                    fsent.write("endnegperf, ext \n")
-                    fsent.write(endextstring+"\n")
-                    fsent.write(endnegperfstring+"\n")
-                    fsent.write("\n")
-                    fsent.write(sentences + "\n"+ "\n")
-                elif endnegperfstring is not "": 
-                    if Y:
-                        fsent.write("negperf, int \n")
-                        fsent.write("\n")
-                        fsent.write(sentences + "\n"+ "\n")
+            
 
-                Z=True
-                if endposperfstring is not "" and internal!=0 : 
-                    fsent.write("endposperf, int \n")
-                    fsent.write(internalstring+"\n")
-                    fsent.write(endposperfstring+"\n")
-                    fsent.write("\n")
-                    fsent.write(sentences + "\n"+ "\n")
-
-                elif endposperfstring is not "": 
-                    fsent.write("endposperf \n")
-                    fsent.write("\n")
-                    fsent.write(endposperfstring+"\n")
-                    fsent.write(sentences + "\n"+ "\n")
-                    Z=False 
-        
-                if endposperfstring is not "" and external!=0 : 
-                    fsent.write("endposperf, ext \n")
-                    fsent.write(endextstring+"\n")
-                    fsent.write(endposperfstring+"\n")
-                    fsent.write("\n")
-                    fsent.write(sentences + "\n"+ "\n")
-
-                elif endposperfstring is not "": 
-                    if Z:
-                        fsent.write("endposperf \n")
-                        fsent.write("\n")
-                        fsent.write(endposperfstring+"\n")
-                        fsent.write(sentences + "\n"+ "\n")
-
-                if internal!=0 and positive!=0 and negative!=0 and external!=0: 
-                    fsent.write("int, ext, pos, neg \n")
-                    fsent.write(internalsent+"\n")
-                    fsent.write("\n")
-                    fsent.write(endposting+"\n")
-                    fsent.write("\n")
-                    fsent.write(endnegstring+"\n")
-                    fsent.write("\n")
-                    fsent.write(endextstring+"\n") 
-                    fsent.write("\n")
-                    fsent.write(sentences + "\n" + "\n")
-
-                elif internal!=0 and positive!=0 and negative!=0: 
-                    fsent.write("int, pos, neg \n" )
-                    fsent.write(internalstring+ "\n")
-                    fsent.write("\n")
-                    fsent.write(endposting+ "\n")
-                    fsent.write("\n")
-                    fsent.write(endnegstring+ "\n")
-                    fsent.write("\n")
-                    fsent.write(sentences + "\n"+ "\n")
-
-                elif internal!=0 and positive!=0 and external!=0: 
-                    fsent.write("int, pos, ext \n")
-                    fsent.write(internalstring+"\n")
-                    fsent.write(endposting+"\n")
-                    fsent.write(endextstring+"\n")
-                    fsent.write(sentences + "\n" + "\n")
-                elif external!=0 and positive!=0 and negative!=0: 
-                    fsent.write("ext, pos, neg \n")
-                    fsent.write(endnegstring+"\n")
-                    fsent.write(endposting+"\n")
-                    fsent.write(endextstring+"\n")
-                    fsent.write(sentences + "\n"  + "\n")
-                elif external!=0 and negative!=0 and internal!=0: 
-                    fsent.write("int, pos, neg \n")
-                    fsent.write(endnegstring+"\n")
-                    fsent.write(internalstring+"\n")
-                    fsent.write(endextstring+"\n")
-                    fsent.write(sentences+ "\n"  + "\n")
-                elif internal!=0 and positive!=0 and external!=0: 
-                    fsent.write("int, pos, ext \n")
-                    fsent.write(endposting+"\n")
-                    fsent.write(internalstring+"\n")
-                    fsent.write(endextstring+"\n")
-                    fsent.write(sentences + "\n" + "\n")
-                elif internal!=0 and positive!=0: 
-                    fsent.write("int, pos \n")
-                    fsent.write(endposting+"\n")
-                    fsent.write(internalstring+"\n")
-                    fsent.write(sentences + "\n" + "\n")
-                elif external!=0 and negative!=0: 
-                    fsent.write("ext, neg \n")
-                    fsent.write(endposting+"\n")
-                    fsent.write(endextstring+"\n")
-                    fsent.write(sentences + "\n" + "\n")
-                elif internal!=0 and negative!=0: 
-                    fsent.write("int, pos \n" + "\n")
-                    fsent.write(endnegstring+"\n")
-                    fsent.write(internalstring+"\n")
-                    fsent.write(sentences + "\n")
-                elif external!=0 and positive!=0: 
-                    fsent.write("ext, pos \n" + "\n")
-                    fsent.write(endextstring+"\n")
-                    fsent.write(endposting+"\n")
-                    fsent.write(sentences + "\n")
-
-
-            """
-
-
-
-            """
-                if negative==1 and external==1: 
-                    print(sentences)
-
-            """ 
-
-            sentlist.append(totalnumberofsent)
+            r=int(totalnumberofsent)+1
+            sentlist.append(r/2)
             if DEBUG:
                 if filenum==1000:
                     break 
+
+             
                         
             
     print(filename)  
@@ -976,10 +797,14 @@ def searchwords():
     print(len(posperflist))    
     print(len(internalsent))
     print(len(externalsent))
-    p=zip(filename,sentnolist,posperfsent,negperfsent,internalsent,externalsent)
+    p=zip(filename,sentnolist,positiveperformancesent,negativeperformancesent,internalsent,externalsent)
     for row in p:
         #print(row)
         wr.writerow(row)
+
+    print(len(f1))
+    return sentlist
+
 
 
 
@@ -1013,9 +838,6 @@ filename,posint,negint,posext,negext
 
 a=0 
 
-corpus="/Users/lucy/Desktop/assortedcodes/assortedcodes/newdictestn/newdic/*.txt"
-csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLM(1).csv"
-csv2="/Users/lucy/Desktop/assortedcodes/builddic/vector(1).csv"
 
 posintlist=[]
 negintlist=[]
@@ -1025,14 +847,15 @@ negextlist=[]
 filenamelist=[]
 yearlist=[]
 ciklist=[]
-
+#sentlist=[] 
 
 
 
 def finalcount(): 
     global a 
     a=0 
-    searchwords()
+    sentlist=searchwords()
+    print(len(sentlist))
     f_out2 = open(csv2, 'w')
     wr2 = csv.writer(f_out2)
 
@@ -1068,6 +891,7 @@ def finalcount():
                     negintlist.append(negint)
                     posextlist.append(posext)
                     negextlist.append(negext)
+                    
                 posint=0
                 negint=0
                 posext=0 
@@ -1081,9 +905,17 @@ def finalcount():
                 posext=posext+1 
             if "1" in row[3] and "1" in row[5]:
                 negext=negext+1
-
+           
     
-            
+    print(len(filenamelist))   
+    print(len(yearlist))  
+    print(len(ciklist))     
+    print(len(posintlist)) 
+    print(len(negintlist))    
+    print(len(posextlist))    
+    print(len(negextlist))    
+    print(len(sentlist))     
+
     p=zip(filenamelist,yearlist,ciklist,posintlist,negintlist,posextlist,negextlist,sentlist) 
     wr2.writerow(["filename","year","cik","posint","negint","posext","negext","sentlist"])
     for row in p:
