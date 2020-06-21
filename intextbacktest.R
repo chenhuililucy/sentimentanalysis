@@ -32,6 +32,9 @@ library(plm)
 `regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$csho))),]
 
 
+`regposnegvector(11)`$roac=as.double(`regposnegvector(11)`$roa)-as.double(`regposnegvector(11)`$roat.1)
+`regposnegvector(11)`$roac1=as.double(`regposnegvector(11)`$roat.1.1)-as.double(`regposnegvector(11)`$roa)
+
 """
 
 d <- transform(`regposnegvector(11)`[grep("^\\d+$",  `regposnegvector(11)`$roa),,drop=T], roa= as.numeric(as.character(roa)))
@@ -50,10 +53,10 @@ d <- transform( `regposnegvector(11)`[grep("^\\d+$",  `regposnegvector(11)`$roat
 `regposnegvector(11)`$roac1=as.double(`regposnegvector(11)`$roat.1.1)-as.double(`regposnegvector(11)`$roa)
 """
 
-`regposnegvector(11)`$posint1=as.double(`regposnegvector(11)`$posint)/as.double(`regposnegvector(11)`$sentlist)
-`regposnegvector(11)`$posext1=as.double(`regposnegvector(11)`$posext)/as.double(`regposnegvector(11)`$sentlist)
-`regposnegvector(11)`$negint1=as.double(`regposnegvector(11)`$negint)/as.double(`regposnegvector(11)`$sentlist)
-`regposnegvector(11)`$negext1=as.double(`regposnegvector(11)`$negext)/as.double(`regposnegvector(11)`$sentlist)
+`regposnegvector(11)`$posint1=as.double(`regposnegvector(11)`$posint)/as.double(`regposnegvector(11)`$sentlist)*100
+`regposnegvector(11)`$posext1=as.double(`regposnegvector(11)`$posext)/as.double(`regposnegvector(11)`$sentlist)*100
+`regposnegvector(11)`$negint1=as.double(`regposnegvector(11)`$negint)/as.double(`regposnegvector(11)`$sentlist)*100
+`regposnegvector(11)`$negext1=as.double(`regposnegvector(11)`$negext)/as.double(`regposnegvector(11)`$sentlist)*100
 `regposnegvector(11)`$int=`regposnegvector(11)`$posint1+`regposnegvector(11)`$negint1
 `regposnegvector(11)`$ext=`regposnegvector(11)`$posext1+`regposnegvector(11)`$negext1
 
@@ -69,21 +72,63 @@ neg <- `regposnegvector(11)`[ which(roac<0),]
 
 summary(pos)
 
-reg = lm_robust(as.double(roac1) ~ sentlist+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = subset(`regposnegvector(11)`))
+reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = subset(`regposnegvector(11)`))
 summary(reg)
 
 
-reg = lm_robust(as.double(roac1) ~ sentlist+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = subset(`regposnegvector(11)`))
+coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
+
+
+#Attribbuting negative performance to internal reasons proves to be correlated with more positive future ROA with 1 year lag
+
+
+
+reg = lm(as.double(roac1) ~  log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = pos)
 summary(reg)
 
+coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
 
-reg = lm_robust(as.double(roac1) ~ sentlist+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = pos)
+#When company has experienced a positive change in performance, attributing positive performance to internal reasons may be correlated with positive future returns
+
+reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = neg)
 summary(reg)
 
-reg = lm_robust(as.double(roac1) ~ sentlist+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = neg)
+coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
+
+#When company is experienced a negative change in performance , attributing negative performance to internal reasons may be correlated with positive future returns, whilst attributing it to external reasons has a negative correlation w future returns. 
+
+
+reg = lm_robust(as.double(roac1) ~ sentlist+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+gic+year, data = neg)
 summary(reg)
 
+#No observation found 
 
+
+reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+gic+year+as.double(roat.1), data = neg)
+summary(reg)
+
+coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
+
+
+#Negative ROA firms tends to attribute negative performance to external reasons and positive performance to internal reasons
+
+
+reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+gic+year+as.double(roat.1), data = pos)
+summary(reg)
+
+coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
+
+
+#Positive ROA firms tends to do the same but not as strongly 
+
+
+reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+gic+year+as.double(roat.1), data = `regposnegvector(11)`)
+summary(reg)
+
+coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
+
+
+# firms tends to attribute negative performance to external reasons and positive performance to internal reasons
 
 
 """
@@ -193,8 +238,10 @@ F-statistic: 62.29 on 83 and 87721 DF,  p-value: < 2.2e-16
 """
 
 
-reg = lm_robust(as.double(roac1) ~ as.double(int)+as.double(ext)+log(as.double(BOV))+as.double(roac)+gic+year, data = data = subset(`regposnegvector(11)`))
+reg = lm_robust(as.double(roac1) ~ as.double(int)+as.double(ext)+log(as.double(BOV))+as.double(roac)+gic+year, data = subset(`regposnegvector(11)`))
 summary(reg)
+
+#Odd results
 
 
 reg = lm_robust(as.double(roac1) ~ as.double(int)+as.double(ext)+log(as.double(BOV))+as.double(roac)+gic+year, data = neg)
