@@ -29,11 +29,16 @@ library(plm)
 `regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.1))),]
 `regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.1.1))),]
 `regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.1.1))),]
-`regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$csho))),]
+`regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.5))),]
+
+#`regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$csho))),]
 
 
-`regposnegvector(11)`$roac=as.double(`regposnegvector(11)`$roa)-as.double(`regposnegvector(11)`$roat.1)
-`regposnegvector(11)`$roac1=as.double(`regposnegvector(11)`$roat.1.1)-as.double(`regposnegvector(11)`$roa)
+`regposnegvector(11)`$roac=(as.double(`regposnegvector(11)`$roa)-as.double(`regposnegvector(11)`$roat.1))*100
+`regposnegvector(11)`$roac1=(as.double(`regposnegvector(11)`$roat.1.1)-as.double(`regposnegvector(11)`$roa))*100
+`regposnegvector(11)`$roacp=(as.double(`regposnegvector(11)`$roat.1)-as.double(`regposnegvector(11)`$roat.2))*100
+
+
 
 """
 
@@ -44,7 +49,7 @@ d <- transform( `regposnegvector(11)`[grep("^\\d+$",  `regposnegvector(11)`$roat
 """
 
 
-`regposnegvector(11)`$BOV=as.double(`regposnegvector(11)`$prcc)*as.double(`regposnegvector(11)`$csho) / as.double(`regposnegvector(11)`$ceq)
+#`regposnegvector(11)`$BOV=as.double(`regposnegvector(11)`$prcc)*as.double(`regposnegvector(11)`$csho) / as.double(`regposnegvector(11)`$ceq)
 `regposnegvector(11)`$gic=as.character(`regposnegvector(11)`$gic)
 `regposnegvector(11)`$year=as.character(`regposnegvector(11)`$year)
 
@@ -72,8 +77,14 @@ neg <- `regposnegvector(11)`[ which(roac<0),]
 
 summary(pos)
 
-reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = subset(`regposnegvector(11)`))
+reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+as.double(roac)+as.double(roa)+gic+year+as.double(marketval), data = subset(`regposnegvector(11)`))
 summary(reg)
+
+
+reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+as.double(roac)+gic+year+as.double(marketval), data = subset(`regposnegvector(11)`))
+summary(reg)
+
+
 
 
 coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
@@ -83,14 +94,22 @@ coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`re
 
 
 
-reg = lm(as.double(roac1) ~  log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = pos)
+reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+as.double(roac)+gic+year+as.double(marketval)+as.double(roa), data = pos)
 summary(reg)
 
 coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
 
+
+
+reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+as.double(roac)+gic+year+as.double(marketval)+as.double(roa), data = pos)
+summary(reg)
+
+coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
+
+
 #When company has experienced a positive change in performance, attributing positive performance to internal reasons may be correlated with positive future returns
 
-reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+as.double(roac)+gic+year, data = neg)
+reg = lm(as.double(roac1) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+as.double(roac)+gic+year+as.double(marketval)+as.double(roa), data = neg)
 summary(reg)
 
 coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
@@ -104,7 +123,7 @@ summary(reg)
 #No observation found 
 
 
-reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+gic+year+as.double(roat.1), data = neg)
+reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+gic+year+as.double(roat.1)+as.double(marketval), data = neg)
 summary(reg)
 
 coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
@@ -113,16 +132,16 @@ coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`re
 #Negative ROA firms tends to attribute negative performance to external reasons and positive performance to internal reasons
 
 
-reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+gic+year+as.double(roat.1), data = pos)
+reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+gic+year+as.double(roat.1)+as.double(marketval), data = pos)
 summary(reg)
 
 coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
 
 
-#Positive ROA firms tends to do the same but not as strongly 
+#Positive ROA firms tends to do the same but not as strongly Amendment 27 June: no significant relationship found 
 
 
-reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+log(as.double(BOV))+gic+year+as.double(roat.1), data = `regposnegvector(11)`)
+reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+gic+year+as.double(roat.1)+as.double(marketval), data = `regposnegvector(11)`)
 summary(reg)
 
 coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))

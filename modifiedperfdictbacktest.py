@@ -1,3 +1,12 @@
+
+
+
+"""
+Backtesting the performance dictionary 
+
+"""
+
+
 # ''' 
 # This piece of code is used to generate weights of documents in four categories: posint,negint,posext,negext
 
@@ -31,8 +40,8 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.tokenize import RegexpTokenizer
 
 corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
-csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(6).csv"
-csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(6).csv"
+csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(13).csv"
+csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(13).csv"
 
 from nltk import ngrams
 
@@ -56,7 +65,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.tokenize import RegexpTokenizer
 
 
-DEBUG=True 
+DEBUG=False 
 new=True
 
 negator="/Users/lucy/Desktop/assortedcodes/builddic/negatorfinal.csv"
@@ -403,7 +412,7 @@ def searchwords():
         return merged_list 
 
 
-    with open("int.csv","r",errors="ignore") as internalfile: 
+    with open("internallemma.csv","r",errors="ignore") as internalfile: 
         w1=[] 
         w2=[]
 
@@ -437,7 +446,7 @@ def searchwords():
     #def external wordlist 
 
     externaldict=defaultdict(list)
-    with open("ext.csv","r",errors="ignore") as externalfile: 
+    with open("externallemma.csv","r",errors="ignore") as externalfile: 
         w1=[]
         w2=[]
         externalwords=csv.reader(externalfile)

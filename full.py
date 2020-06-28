@@ -22,8 +22,8 @@ negperflist.csv --------   csv with  amplifier & negator adjusted negative perfo
 '''
 
 corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
-csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(11).csv"
-csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(11).csv"
+csv1="/Users/lucy/Desktop/assortedcodes/builddic/sentenceLMregposneg(12).csv"
+csv2="/Users/lucy/Desktop//assortedcodes/builddic/regposnegvector(12).csv"
 
 
 
@@ -310,7 +310,7 @@ def searchwords():
         return merged_list 
 
 
-    with open("int.csv","r",errors="ignore") as internalfile: 
+    with open("internallemma.csv","r",errors="ignore") as internalfile: 
         w1=[] 
         w2=[]
 
@@ -344,7 +344,7 @@ def searchwords():
     #def external wordlist 
 
     externaldict=defaultdict(list)
-    with open("ext.csv","r",errors="ignore") as externalfile: 
+    with open("externallemma.csv","r",errors="ignore") as externalfile: 
         w1=[]
         w2=[]
         externalwords=csv.reader(externalfile)
@@ -634,7 +634,7 @@ def searchwords():
                                                 print(ww[i])
                                                 print(ww[i+b])
                                                 print(ww[i+a+b])
-                                                print(ww[i:i+b+a+1]) 
+                                                #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
                                                 endnegperf=False
 

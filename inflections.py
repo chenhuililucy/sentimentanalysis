@@ -11,8 +11,14 @@ from pattern.en import pluralize, singularize, conjugate
 from pattern.en import conjugate, lemma, lexeme,PRESENT,SG
 import os
 import re
+
+#Please import pattern .en from the nodebox lib 
 os.chdir("/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7")
-#import en #nodebox lib
+# please modify the source directory to where the main csv with all the words are stored
+src= "/Users/lucy/Desktop/assortedcodes/builddic/ext.csv" 
+#os.chdir("/Users/lucy/Desktop/assortedcodes/builddic/")
+
+
 
 
 """ 
@@ -40,12 +46,6 @@ def convert(word, from_pos, to_pos):
     if not synsets:
         return []
  
-    # Get all lemmas of the word (consider 'a'and 's' equivalent)
-    # the logic is the following
-    # for s in synsets: 
-    # for l i s.lemmas
-
-
     for s in synsets: 
         print(s.name())
     
@@ -58,7 +58,6 @@ def convert(word, from_pos, to_pos):
     # Get related forms=> nested list
     derivationally_related_forms = [(l, l.derivationally_related_forms()) for l in lemmas]
     #print(derivationally_related_forms)
-    #debug 
     related_noun_lemmas=[]
     for drf in derivationally_related_forms: #list in nested list 
         #print(drf)
@@ -84,11 +83,7 @@ def checklemma(wordspecific, to_pos):
             x[word].append(pos)       # adding key-value to x
 
     if (x[wordspecific])==to_pos:
-# to print the pos tags for the word 'further'
         return True
-#['RBR']
-
-
         
 
     """
@@ -146,7 +141,7 @@ model = KeyedVectors.load_word2vec_format(glove_filename, binary=False)
 
 def close_adv(input, num=5, model_topn=50):
   positive = [input, 'happily']
-  negative = [       'happy']
+  negative = [       'happy'] 
   input=re.match("/^[A-Z]+$/i",input)
   if input not in model.wv.vocab: 
       return None
@@ -161,12 +156,6 @@ def close_adv(input, num=5, model_topn=50):
   print(close[:num])
   print("close_adv")
   return close[:num]
-
-
-
-src= "/Users/lucy/Desktop/assortedcodes/afile(1).csv"
-src= "/Users/lucy/Desktop/assortedcodes/intext15april.csv"
-src="/Users/lucy/Desktop/assortedcodes/negativeperf.csv"
 
 
 classifyingphraselist=[]
@@ -185,53 +174,6 @@ Pos tag output phrases and words and write them to a new csv file
 Dependencies: 
 * csv file with list of performance words 
 """
-
-# def posttagperformance(): 
-#     list=[]
-#     word1list=[] 
-#     word2list=[]
-#     tag1list=[]
-#     tag2list=[]
-#     with open(src, "r",encoding="utf-8", errors="ignore") as csvfile: 
-#         freader = csv.reader(csvfile)
-#         for row in freader: 
-#             words=row[0].split(" ")
-#             postags=nltk.pos_tag(words)
-#             if len(postags)>1: 
-#                 word1,word2=postags
-#                 word1,tag1=word1
-#                 word2,tag2=word2
-#             else: 
-#                 word1=postags
-#                 #print(word1)
-#                 n=0
-#                 for word1[n] in word1: 
-#                     #print(word1[n])
-#                     (word1,tag1)=(word1[n])
-#                     word2="."
-#                     tag2="."
-#                     n+=1
-#             word1list.append(word1)
-#             word2list.append(word2)
-#             tag1list.append(tag1)
-#             tag2list.append(tag2)
-#             result= [(word, tag) for word, tag in postags]
-#             list.append(result)
-         
-#         p=zip(word1list,tag1list,word2list,tag2list)    
-
-            
-#         csvfile.close()
-        
-    # with open("afile(1)postagged.csv","w",encoding="utf-8", errors="ignore") as csvfile:
-    #     fwriter = csv.writer(csvfile)
-    #     for i in p:
-    #         fwriter.writerow(i)
-    #     csvfile.close()
-
-
-#posttagperformance()
-
 
 def out(classifyingphraselist): 
     global word1list
@@ -415,111 +357,8 @@ def out(classifyingphraselist):
 
 out(classifyingphraselist)
 
-"""
 
-
-def posttagperformance(amended): 
-
-    list=[]
-    word1list=[] 
-    word2list=[]
-    tag1list=[]
-    tag2list=[]
-
-
-    print(len(amended))
-
-    for item in classifyingphraselist: 
-        words=item.split(" ")
-        postags=nltk.pos_tag([i for i in words if i])
-
-
-
-
-
-    os.chdir("/Users/lucy/Desktop/assortedcodes/")
-
-
-    for element in amended:
-    # with open(src, "r",encoding="utf-8", errors="ignore") as csvfile: 
-    #     freader = csv.reader(csvfile)
-    #     for row in freader: 
-    #         words=row[0].split(" ")
-    #postags=nltk.pos_tag([i for i in words if i]) # rid empty strings
-        if element is not None:
-            words=element.split(" ")
-            postags=nltk.pos_tag([i for i in words if i])
-            if len(postags)>1: 
-                word1,word2=postags
-                word1,tag1=word1
-                word2,tag2=word2
-            else: 
-                if len(postags)==1:
-                    word1=postags
-                    #print(word1)
-
-                    for word1[0] in word1: 
-                        #print(word1[n])
-                        (word1,tag1)=(word1[0])
-                    word2=None 
-                    tag2=None
-
-            word1list.append(word1)
-            word2list.append(word2)
-            tag1list.append(" ")
-            tag2list.append(" ")
-        #result= [(word, tag) for word, tag in postags]
-        #list.append(result)
-    
-
-    p=zip(word1list,tag1list,word2list,tag2list)    
-            
-
-
-
-    fin=[]
-
-    for i in range(len(word1list)): 
-        if word2list[i]: 
-            fin.append(word1list[i]+" "+word2list[i])
-        else: 
-            fin.append(word1list[i])
-
-    #out(classifyingphraselist)
-
-
-
-    #out(classifyingphraselist)
-    fin=[]
-    for i in range(len(word1list)): 
-        fin.append(word1list[i]+" "+word2list[i])
-
-
-
-    with open("negativeperf.csv(2).csv","w",encoding="utf-8", errors="ignore") as csvfile:
-        fwriter = csv.writer(csvfile)
-        for i in fin:
-            fwriter.writerow([i])
-        csvfile.close()
-
-
-
-    with open("internalexternalfinal(2)(2).csv","w",encoding="utf-8", errors="ignore") as csvfile:
-        fwriter = csv.writer(csvfile)
-        for i in fin:
-            fwriter.writerow(i)
-        csvfile.close()
-
-
-
-
-out(classifyingphraselist)
-
-"""
-
-os.chdir("/Users/lucy/Desktop/assortedcodes/builddic/")
-
-with open("negativeperf.csv(1).csv","w",encoding="utf-8", errors="ignore") as csvfile:
+with open("externallemma.csv","w",encoding="utf-8", errors="ignore") as csvfile:
     fwriter = csv.writer(csvfile)
     for i in amended:
         if i is not None:
