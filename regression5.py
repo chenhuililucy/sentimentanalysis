@@ -10,7 +10,7 @@ import os
 import re
 
 #dir1= "/Users/lucy/Desktop/assortedcodes/5df8773df51c8ae4.csv"
-dir2= "/Users/lucy/Desktop/assortedcodes/builddic/regposnegvector13.csv"
+dir2= "/Users/lucy/Desktop/assortedcodes/builddic/regposnegvector11.csv"
 
 allfiles="/Users/lucy/Desktop/others/allfiles"
 
@@ -227,6 +227,7 @@ l27=[]
 l28=[] 
 l29=[]
 l30=[]
+A=[]
 
 
 
@@ -519,15 +520,15 @@ with open(dir2,"r") as posfile:
         cik=row[2]
 
         l3.append(row[2])
-        l4.append(float(row[3])/float(row[6]))
-        l5.append(float(row[4])/float(row[6]))
-        if float(row[4])!=0:
-            l13.append((float(row[3])+float(row[5]))/float(row[4]))
-        else: 
-            l13.append(".")
+        l4.append(float(row[3])/float(row[7]))
+        l5.append(float(row[4])/float(row[7]))
+        l8.append(float(row[5])/float(row[7]))
+        l13.append(float(row[6])/float(row[7]))
+
+
         l6.append(".")
-        l8.append(float(row[5])/float(row[6]))
-        l12.append(row[6])
+        
+        l12.append(row[7])
     posfile.close()
     #l6.append(int(row[5])/int(row[7]))
     #l7.append(int(row[6])/int(row[7]))
@@ -707,12 +708,12 @@ finitem=[]
 
 
 
-z=zip(l1,l2,l3,l4,l5,l8,l6,l7,l9,l11,l21,l22,l23,l24,l25,l12,l13,l14,l15,l16,l17,l18,l19,l20,f,pop)
-csv2="/Users/lucy/Desktop/assortedcodes/vectorfinal(12).csv"
+z=zip(l1,l2,l3,l4,l5,l8,l13,l6,l7,l9,l11,l21,l22,l23,l24,l25,l12,l14,l15,l16,l17,l18,l19,l20,f,pop)
+csv2="/Users/lucy/Desktop/assortedcodes/builddic/regposnegvector11.csv"
 f_out2 = open(csv2, 'w')
 wr2 = csv.writer(f_out2)
 #wr2.writerow(["filename","year","cik","posl","negl","negneg","spreturns","roa","filedate"])
-wr2.writerow(["filename","year","cik","posl","negl","negneg","spreturns","roa","roat-1","roat+1","roat-2","roat+2","roat+3","roat+4","roat+5","length","percwrds","marketval","BOV","lev","prcc","csho","ceq","gic","filedate","shareturnover"])
+wr2.writerow(["filename","year","cik","posint","negint","posext","negext","spreturns","roa","roat-1","roat+1","roat-2","roat+2","roat+3","roat+4","roat+5","length","percwrds","marketval","BOV","lev","prcc","csho","ceq","gic","filedate","shareturnover"])
 
 #wr2.writerow(["filename","year","cik","posint","negint","posextlist","negextlist","filingdate"])
 for i in z: 
@@ -723,7 +724,7 @@ for i in z:
 
 # Want to write out metrics for the past 5 years 
 
-with open("/Users/lucy/Desktop/assortedcodes/vectorfinal(7).csv","r") as posfile: 
+with open("/Users/lucy/Desktop/assortedcodes/builddic/regposnegvector11.csv","r") as posfile: 
     #print("u")
     d=defaultdict(list)
     records=csv.reader(posfile)
@@ -736,28 +737,49 @@ with open("/Users/lucy/Desktop/assortedcodes/vectorfinal(7).csv","r") as posfile
             year=int(row[1])
         except ValueError: 
             pass
-        d[year].extend([row[3],row[4],row[5]])
+        if row[3]: 
+            pass
+        else: 
+            row[3]=="."
+        if row[4]: 
+            pass
+        else: 
+            row[4]=="."
+        if row[5]: 
+            pass
+        else: 
+            row[5]=="."
+        if row[6]: 
+            pass
+        else: 
+            row[6]=="."            
+        d[year].extend([row[3],row[4],row[5],row[6]])
 
     posfile.close()
 
-print(d)
-with open("/Users/lucy/Desktop/assortedcodes/vectorfinal(7).csv","r") as posfile: 
+with open("/Users/lucy/Desktop/assortedcodes/builddic/regposnegvector11.csv","r") as posfile: 
     #print("u")
-    pos1=[]
-    neg1=[]
-    negneg1=[]
-    pos2=[]
-    neg2=[] 
-    negneg2=[]
-    pos3=[]
-    neg3=[] 
-    negneg3 =[]
-    pos4=[]
-    neg4 =[]
-    negneg4=[]
-    pos5=[]
-    neg5 =[]
-    negneg5=[]
+    posint1=[]
+    negint1=[]
+    posext1=[]
+    negext1=[]
+    posint2=[]
+    negint2=[]
+    posext2=[]
+    negext2=[]
+    posint3=[]
+    negint3=[]
+    posext3=[]
+    negext3=[]
+    posint4=[]
+    negint4=[]
+    posext4=[]
+    negext4=[]
+    posint5=[]
+    negint5=[]
+    posext5=[]
+    negext5=[]
+
     records=csv.reader(posfile)
     i=0
     for row in records:
@@ -769,57 +791,80 @@ with open("/Users/lucy/Desktop/assortedcodes/vectorfinal(7).csv","r") as posfile
             year=int(row[1])
         except ValueError: 
             year=0
+
     if int(year-1) in d: 
-        pos1.append(d[year-1][1])
-        neg1.append(d[year-1][2])
-        negneg1.append(d[year-1][3])
+        posint1.append(d[year-1][1])
+        negint1.append(d[year-1][2])
+        posext1.append(d[year-1][3])
+        negext1.append(d[year-1][4])
+
     else: 
-        pos1.append(".")
-        neg1.append(".")
-        negneg1.append(".")
+        posint1.append(".")
+        negint1.append(".")
+        posext1.append(".")
+        negext1.append(".")
+
     if int(year-2) in d: 
-        pos2.append(d[year-2][1])
-        neg2.append(d[year-2][2])
-        negneg2.append(d[year-2][3])
+        posint2.append(d[year-2][1])
+        negint2.append(d[year-2][2])
+        posext2.append(d[year-2][3])
+        negext2.append(d[year-2][4])
+
     else: 
-        pos2.append(".")
-        neg2.append(".")
-        negneg2.append(".")
+        posint2.append(".")
+        negint2.append(".")
+        posext2.append(".")
+        negext2.append(".")
+
+
     if int(year-3) in d: 
-        pos3.append(d[year-3][1])
-        neg3.append(d[year-3][2])
-        negneg3.append(d[year-3][3])
+        posint3.append(d[year-3][1])
+        negint3.append(d[year-3][2])
+        posext3.append(d[year-3][3])
+        negext3.append(d[year-3][4])
+
     else: 
-        pos3.append(".")
-        neg3.append(".")
-        negneg3.append(".")
+        posint3.append(".")
+        negint3.append(".")
+        posext3.append(".")
+        negext3.append(".")
+
+
     if int(year-4) in d: 
-        pos4.append(d[year-4][1])
-        neg4.append(d[year-4][2])
-        negneg4.append(d[year-4][3])
+        posint4.append(d[year-4][1])
+        negint4.append(d[year-4][2])
+        posext4.append(d[year-4][3])
+        negext4.append(d[year-4][4])
+
     else: 
-        pos4.append(".")
-        neg4.append(".")
-        negneg4.append(".")
+        posint4.append(".")
+        negint4.append(".")
+        posext4.append(".")
+        negext4.append(".")
+
+
     if int(year-5) in d: 
-        pos5.append(d[year-5][1])
-        neg5.append(d[year-5][2])
-        negneg5.append(d[year-5][3])
+        posint5.append(d[year-5][1])
+        negint5.append(d[year-5][2])
+        posext5.append(d[year-5][3])
+        negext5.append(d[year-5][4])
+
     else: 
-        pos5.append(".")
-        neg5.append(".")
-        negneg5.append(".")
+        posint5.append(".")
+        negint5.append(".")
+        posext5.append(".")
+        negext5.append(".")
         
     posfile.close()
 
 
 
-z=zip(l1,l2,l3,l4,l5,l8,pos1,neg1,negneg1,pos2,neg2,negneg2,pos3,neg3,negneg3,pos4,neg4,negneg4,pos5,neg5,negneg5,l6,l7,l9,l11,l21,l22,l23,l24,l25,l12,l13,l14,l15,l16,l17,l18,l19,l20,f,pop)
-csv2="/Users/lucy/Desktop/assortedcodes/vectorfinalfinal.csv"
+z=zip(l1,l2,l3,l4,l5,l8,posint1,negint1,posext1,negext1,posint2,negint2,posext2,negext2,posint3,negint3,posext3,negext3,posint4,negint4,posext4, negext4,posint5,negint5,posext5,negext5,l6,l7,l9,l11,l21,l22,l23,l24,l25,l12,l13,l14,l15,l16,l17,l18,l19,l20,f,pop)
+csv2="/Users/lucy/Desktop/assortedcodes/vectorfinalinternalexternal.csv"
 f_out2 = open(csv2, 'w')
 wr2 = csv.writer(f_out2)
 #wr2.writerow(["filename","year","cik","posl","negl","negneg","spreturns","roa","filedate"])
-wr2.writerow(["filename","year","cik","posl","negl","negneg","posllag1","negllag1","negneglag1","posllag2","negllag2","negneglag2","posllag3","negllag3","negneglag3","posllag4","negllag4","negneglag4","posllag5","negllag5","negneglag5""spreturns","roa","roat-1","roat+1","roat-2","roat+2","roat+3","roat+4","roat+5","length","percwrds","marketval","BOV","lev","prcc","csho","ceq","gic","filedate","shareturnover"])
+wr2.writerow(["filename","year","cik","posint1","negint1","posext1","negext1","posint2","negint2","posext2","negext2","posint3","negint3","posext3","negext3","posint4","negint4","posext4","negext4","posint5","negint5","posext5","negext5","spreturns","roa","roat-1","roat+1","roat-2","roat+2","roat+3","roat+4","roat+5","length","percwrds","marketval","BOV","lev","prcc","csho","ceq","gic","filedate","shareturnover"])
 
 #wr2.writerow(["filename","year","cik","posint","negint","posextlist","negextlist","filingdate"])
 for i in z: 

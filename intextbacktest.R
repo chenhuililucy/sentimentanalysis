@@ -29,7 +29,7 @@ library(plm)
 `regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.1))),]
 `regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.1.1))),]
 `regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.1.1))),]
-`regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.5))),]
+`regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$roat.3))),]
 
 #`regposnegvector(11)` <- `regposnegvector(11)`[!is.na(as.numeric(as.character(`regposnegvector(11)`$csho))),]
 
@@ -133,6 +133,13 @@ coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`re
 
 
 reg = lm(as.double(roa) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+gic+year+as.double(roat.1)+as.double(marketval), data = pos)
+summary(reg)
+
+coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
+
+
+
+reg = lm(as.double(roac) ~ log(sentlist)+as.double(posint1)+as.double(posext1)+as.double(negint1)+as.double(negext1)+as.double(BOV)+gic+year+as.double(ROAl)+as.double(roacp)+as.double(marketval), data = pos)
 summary(reg)
 
 coeftest(reg, vcov=vcovHC(reg, type = 'HC0', cluster = 'gic'), data = subset(`regposnegvector(11)`))
