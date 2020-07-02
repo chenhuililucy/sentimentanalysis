@@ -1,20 +1,31 @@
 
 # """
-# Finalized file, prepare data for regression
-
+# Finalized file, prepare data for regression, this is for your reference. 
 # """
 
 
 import csv
 import os
 import re
+from collections import defaultdict
 
-#dir1= "/Users/lucy/Desktop/assortedcodes/5df8773df51c8ae4.csv"
+
+#FILE OF POSITIVE AND NEGATIVE METRICS FOR EACH DOCUMENT 
 dir2= "/Users/lucy/Desktop/assortedcodes/builddic/regposnegvector13.csv"
 
+#DIRECTORY OF ALL 10-Ks, NOT TO BE CONFUSED WITH (CORPUS) DIRECTORY WITH ALL MD&As
 allfiles="/Users/lucy/Desktop/others/allfiles"
 
-from collections import defaultdict
+
+
+                    #################################
+
+#PART I: EXTRACTING INFORMATION FROM FILES ON WHARTON DATA SERVICE AND STORING IN DICT 
+
+                    #################################
+
+
+# EXAMPLE I: 
 
 """ 
 Part 1: retrieve all filedates
@@ -25,15 +36,13 @@ item2="FILER"
 item3="COMPANY CONFORMED NAME:"
 item=item.lower()
 
-dfin="/Users/lucy/Desktop/assortedcodes/91e17c1ef257fb31.csv" # for ROA data 
+
 dfin="/Users/lucy/Desktop/assortedcodes/1978dd2de17ce8f3.csv" # Debug, 26 June
-dfin2=""
 
 d=False
 
 d2=defaultdict(list)
 with open(dfin,"r") as posfile: 
-    #print("u")
     records=csv.reader(posfile)
     i=0
     for row in records:
@@ -43,13 +52,12 @@ with open(dfin,"r") as posfile:
         cik=row[15]
         if len(cik)<10:
             p=10-len(cik)
-            cik="0"*p+cik
+            cik="0"*p+cik # THE CIK CONSISTS OF 10 DIGITS, FOR CONSISTENCY, IF LENGTH OF CIK IN CSV IS LESS THAN 10, MAKE IT 10
             print("y")
         datadate=row[2]
         ni=row[13]
         at=row[9]
-        #print(ni)
-        #if ni.isnumeric() and at.isnumeric():
+
         try:
             float(ni)
             float(at)
@@ -57,28 +65,16 @@ with open(dfin,"r") as posfile:
                 ROA=float(ni)/float(at)
 
                 d2.update({(cik,datadate):[ROA]})
-                # for e in d2[(cik,datadate)]:
-                #     if e==ROA: 
-                #         d=True 
 
-                # if not d:
-                #     d2[(cik,datadate)].append(ROA)
-                #     d=False
-                #d.update({(cik,datadate):[ROA]})
         except ValueError:
             print ("Not a float")
             print(ni)
             print(at)
 
-        #print(ROA)
-       # i+=1
 
     posfile.close()
 
 d=defaultdict(list)
-
-dfin1="/Users/lucy/Desktop/assortedcodes/dfb333d6ddf9d922.csv" # for ROA data 
-
 
 with open("/Users/lucy/Desktop/assortedcodes/1978dd2de17ce8f3.csv","r") as posfile: 
     #print("u")
@@ -145,7 +141,7 @@ with open("/Users/lucy/Desktop/assortedcodes/1978dd2de17ce8f3.csv","r") as posfi
 
 
 
-
+# EXAMPLE II: 
 
 dfin1="/Users/lucy/Desktop/assortedcodes/49a54bfd0097208b.csv"
 
@@ -194,7 +190,13 @@ with open(dfin1,"r") as posfile:
 
 
     
-#print(d)
+                    #################################
+
+#PART II: MATCHING METRICS FROM FILE OF POSITIVE AND NEGATIVE METRICS FOR EACH DOCUMENT WITH ENTRIES IN DICT
+
+                    #################################
+
+
 
 s=defaultdict(int)
 l1=[]
@@ -234,9 +236,6 @@ with open(dir2,"r") as posfile:
     records=csv.reader(posfile)
     i=0
     
-    
-
-#epspi,epspx,mkvalt, prcc, csho, ceq, gic
 
     for row in records:
         if i==0: 
@@ -308,55 +307,7 @@ with open(dir2,"r") as posfile:
         else: 
             l25.append(".")
 
-        
-
-        # if d.get((cik,year)):
-        #     if len(d[(cik,year)])==1 or len(d[(cik,year)])==4 or len(d[(cik,year)])==5 or len(d[(cik,year)])==8:
-        #         if d[(cik,year)][0]:
-
-        #             ROA=d[(cik,year)][0]
-        #             l7.append(ROA)
-        #         else:
-        #             l7.append(".")
-        #     else: 
-        #         l7.append(".")
-        # else: 
-        #     l7.append(".")
-
-
-        # if year.isdigit():
-        #     year2=int(year)+1
-        #     year1=int(year)-1
-
-        # if d.get((cik,str(year1))):
-        #     if len(d[(cik,year1)])==1 or len(d[(cik,year1)])==4 or len(d[(cik,year1)])==5 or len(d[(cik,year1)])==8:
-        #         if d[(cik,year1)][0]:
-
-        #             ROA1=d[(cik,year1)][0]
-        #             l9.append(ROA1)
-        #         else:
-        #             l9.append(".")
-        #     else: 
-        #         l9.append(".")
-        # else: 
-        #     l9.append(".")
-
-
-        # if d.get((cik,str(year2))):
-        #     if len(d[(cik,year2)])==1 or len(d[(cik,year2)])==4 or len(d[(cik,year2)])==5 or len(d[(cik,year2)])==8:
-        #         if d[(cik,year2)][0]:
-
-        #             ROA2=d[(cik,year2)][0]
-        #             l11.append(ROA2)
-        #         else:
-        #             l11.append(".")
-        #     else: 
-        #         l11.append(".")
-        # else: 
-        #     l11.append(".")
-
-
-
+    
 #
         if d.get((cik,year)):
 
@@ -379,55 +330,6 @@ with open(dir2,"r") as posfile:
             l16.append(mkvalt)
         else: 
             l16.append(".")
-
-        #     if len(d[(cik,year)])==4 or len(d[(cik,year)])==8:
-        #         epspi=d[(cik,year)][1]
-        #         l14.append(epspi)
-        #     elif len(d[(cik,year)])==7:
-        #         epspi=d[(cik,year)][0]
-        #         l14.append(epspi)
-        #     elif len(d[(cik,year)])==3:
-        #         epspi=d[(cik,year)][0]
-        #         l14.append(epspi)
-        #     else:
-        #         l14.append(".")
-        # else: 
-        #     l14.append(".")
-
-#
-
-        # if d.get((cik,year)):
-        #     if len(d[(cik,year)])==4 or len(d[(cik,year)])==8:
-        #         epspx=d[(cik,year)][2]
-        #         l15.append(epspx)
-        #     elif len(d[(cik,year)])==7:
-        #         epspx=d[(cik,year)][1]
-        #         l15.append(epspx)
-        #     elif len(d[(cik,year)])==3:
-        #         epspx=d[(cik,year)][1]
-        #         l15.append(epspx)
-        #     else: 
-        #         l15.append(".")
-
-        # else: 
-        #     l15.append(".")
-
-
-        # if d.get((cik,year)):
-        #     if len(d[(cik,year)])==4 or len(d[(cik,year)])==8:
-        #         mkvalt=d[(cik,year)][3]
-        #         l16.append(mkvalt)
-        #     elif len(d[(cik,year)])==7:
-        #         mkvalt=d[(cik,year)][2]
-        #         l16.append(mkvalt)
-        #     elif len(d[(cik,year)])==3:
-        #         mkvalt=d[(cik,year)][2]
-        #         l16.append(mkvalt)
-        #     else: 
-        #         l16.append(".")
-        # else: 
-        #     l16.append(".")
-
 
 #
         if d.get((cik,year)):
@@ -529,11 +431,20 @@ with open(dir2,"r") as posfile:
         l8.append(float(row[5])/float(row[6]))
         l12.append(row[6])
     posfile.close()
-    #l6.append(int(row[5])/int(row[7]))
-    #l7.append(int(row[6])/int(row[7]))
+
 
 i=i+1
 f=[0]*i
+
+    
+                    #################################
+
+            #PART III: MATCHING METRICS WITH FILING DATES 
+
+                    #################################
+
+
+
 
 for root, dirs, files in os.walk("/Users/lucy/Desktop/others/allfiles"):
     for file in files:
@@ -600,13 +511,7 @@ for i in zip(l3,f):
         except ValueError: 
             mind="."
             maxd="."
-            #20 Jun debug
-            #print(date)
-            #print("value error with date entry")
-            #
-            #print(date[:4])
-            #print(date[4:6])
-            #print(date[6:8])
+
         
     #maxd=datetime.date(int(date[:4]),int(date[4:6]),int(date[6:8]))-timedelta(days=6)
     d[cik].append([index,date,mind,maxd])
@@ -640,23 +545,8 @@ with open("/Users/lucy/Desktop/assortedcodes/31b3605da3e00c98.csv","r") as posfi
                 try:
                     b=datetime.date(int(str(e[2])[:4]), int(str(e[2])[5:7]),int(str(e[2])[8:10]))
 
-                    #20 Jun Debug
-                    #b=e[2]
-                    #print("b")
-                    #print(b)
-                    #
-
                     u=datetime.date(int(str(e[3])[:4]), int(str(e[3])[5:7]),int(str(e[3])[8:10]))
-                    #u=e[3]
 
-                    #20 Jun Debug
-                    #print("u")
-                    #print(u)
-                    #
-
-                    #print(type(e[2]))
-                
-                    #print(int(row[9][:4])
                     if b<datetime.date(int(row[9][:4]),int(row[9][4:6]),int(row[9][6:8])) and u>datetime.date(int(row[9][:4]),int(row[9][4:6]),int(row[9][6:8])):
                         try:
                             pop[int(e[0])]+=float(row[11]) # the pop list stores all the matches 
@@ -670,41 +560,15 @@ with open("/Users/lucy/Desktop/assortedcodes/31b3605da3e00c98.csv","r") as posfi
 
                     else: 
                         pass
-                        #print(datetime.date(int(row[9][:4]),int(row[9][4:6]),int(row[9][6:8])))
 
                 except ValueError or TypeError: 
                     pass
-                    #print("value error with dict")
-                    #print(e)
-                    #print(cik)
-                    #print(l)
+
 
     posfile.close()
 
 finpop=[] 
 finitem=[]
-
-
-# for item in zip(pop,l): 
-#     popitem, litem= item 
-
-#     """
-#     if int(litem)<60: 
-#         popitem="."
-#         litem="."
-#         finpop.append(popitem)
-#         #finitem.append(litem)
-#     else: 
-#     """
-#     finpop.append(popitem)
-#         #finitem.append(litem)
-
-#     #row[9]
-
-
-#     #int(date[:5])*365+int(date[5:7])*
-
-
 
 
 z=zip(l1,l2,l3,l4,l5,l8,l6,l7,l9,l11,l21,l22,l23,l24,l25,l12,l13,l14,l15,l16,l17,l18,l19,l20,f,pop)
