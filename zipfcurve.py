@@ -1,5 +1,5 @@
 corpus="/Users/lilucy/Desktop/Data-structure-and-Algo-Notes/newdic/*.txt"
-wordfile="/Users/lilucy/Desktop/Data-structure-and-Algo-Notes/ngramis13tfidf.csv"
+wordfile="/Users/lilucy/Desktop/ngram13tfidfouttfidflesthan8.csv"
 import re
 import glob
 import os
@@ -69,8 +69,6 @@ for files in glob.glob(corpus):
         except IndexError: 
             pass
         a+=1
-        if a==10: 
-            break
         if a%10000==0: 
             print("-")
            #break
@@ -89,7 +87,7 @@ print(np.percentile(vector, [25, 50, 75]))
 
 #final=[(l,k) for k,l in sorted([(j,i) for i,j in C.items()])]
 
-with open('/Users/lilucy/Desktop/zipfdata.csv','w') as csvfile:
+with open('/Users/lilucy/Desktop/zipfdata<8.csv','w') as csvfile:
     fieldnames=['word','count']
     writer=csv.writer(csvfile)
     writer.writerow(fieldnames)
