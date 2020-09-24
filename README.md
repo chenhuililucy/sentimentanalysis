@@ -1,4 +1,4 @@
-				Contributions: 
+
 
 •	Attribution theory dictionary and reading engine, similar to LM, but with more complex semantic structures that can be reapplied to any research relating to internal, external or performance based 10-K vocabulary, or any financial use to extract components of 10-Ks that contain the aforementioned language
 •	Test the correlation between performance and internal and external sentiments 
