@@ -15,7 +15,7 @@ import re
 #Please import pattern .en from the nodebox lib 
 os.chdir("/Library/Frameworks/Python.framework/Versions/3.7/lib/python3.7")
 # please modify the source directory to where the main csv with all the words are stored
-src= "/Users/lucy/Desktop/assortedcodes/negativeperf.csv" 
+src= "/Users/lucy/Desktop/assortedcodes/positiveperf.csv" 
 #os.chdir("/Users/lucy/Desktop/assortedcodes/builddic/")
 
 
@@ -358,7 +358,7 @@ def out(classifyingphraselist):
 out(classifyingphraselist)
 
 
-with open("negativelemma.csv","w",encoding="utf-8", errors="ignore") as csvfile:
+with open("positivelemma.csv","w",encoding="utf-8", errors="ignore") as csvfile:
     fwriter = csv.writer(csvfile)
     for i in amended:
         if i is not None:

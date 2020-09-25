@@ -1,5 +1,5 @@
 
-
+import operator 
 
 """
 Backtesting the performance dictionary 
@@ -328,7 +328,7 @@ def searchwords():
 
     
 
-    sentlog_outputfields=["filename","sentnolist","positiveperformancesent","negativeperformancesent","negneg","sentlen","LMpos","LMneg"]
+    sentlog_outputfields=["filename","sentnolist","positiveperformancesent","negativeperformancesent","negneg","sentlen","LMpos","LMneg","poscount","negcount"]
 
 
     externalsent=[]
@@ -434,7 +434,7 @@ def searchwords():
                                                 fsent.write("doubleneg")
                                                 fsent.write(str(ww[i:i+a+b+1]))
                                                 #freq count increment
-                                                dictcount[ww[i,i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 # alternative sol
                                                 posperfcnt+=1
                                                 i=i+a+b 
@@ -444,7 +444,7 @@ def searchwords():
                                             elif "." in negperfdict[ww[i+b]] :
                                                 fsent.write("doubleneg")
                                                 fsent.write(str(ww[i:i+b+1]))     
-                                                dictcount[ww[i:i+b+1]]+=1
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 posperfcnt+=1
                                                 i=i+b
                                                 BOOl=False
@@ -455,7 +455,7 @@ def searchwords():
                                             if ww[i+a+b] in posperdict[ww[i+b]]: 
                                                 fsent.write("negative")
                                                 fsent.write(str(ww[i:i+a+b+1]))       
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 negperfcnt+=1
                                                 i=i+a+b 
                                                 BOOl=False
@@ -464,7 +464,7 @@ def searchwords():
                                             elif "." in posperdict[ww[i+b]] :
                                                 fsent.write("negative")
                                                 fsent.write(str(ww[i:i+b+1]))
-                                                dictcount[ww[i:i+b+1]]+=1
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 negperfcnt+=1
                                                 i=i+b
                                                 BOOl=False
@@ -477,7 +477,7 @@ def searchwords():
                                             if ww[i+a+b] in posperdict[ww[i+b]]: 
                                                 fsent.write("positive")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 posperfcnt+=1
                                                 i=i+a+b
                                                 BOOl=False
@@ -486,7 +486,7 @@ def searchwords():
                                             elif "." in posperdict[ww[i+b]]:
                                                 fsent.write("positive")                                                
                                                 fsent.write(str(ww[i:i+b+1]))
-                                                dictcount[ww[i:i+b+1]]+=1
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 posperfcnt+=1                                      
                                                 i=i+b
                                                 BOOl=False
@@ -505,7 +505,7 @@ def searchwords():
                                                 # print(ww[i+a+b])
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 negperfcnt+=1 
                                                 i=i+a+b 
                                                 BOOl=False
@@ -514,7 +514,7 @@ def searchwords():
                                             elif "." in negperfdict[ww[i+b]]: 
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+b+1]))  
-                                                dictcount[ww[i:i+b+1]]+=1
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 negperfcnt+=1
                                                 i=i+b
                                                 BOOL=False
@@ -535,7 +535,7 @@ def searchwords():
                                                     # print(ww[i+a+b])    
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+b+a+1]))    
-                                                dictcount[ww[i:i+b+a+1]]+=1
+                                                dictcount[str(ww[i:i+b+a+1])]+=1
                                                 negperfcnt+=1
                                                 i=i+a+b 
                                                 BOOl=False
@@ -544,7 +544,7 @@ def searchwords():
                                             elif "." in posperdict[ww[i+b]]:
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+b+1]))
-                                                dictcount[ww[i:i+b+1]]+=1
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 negperfcnt+=1                                         
                                                 i=i+b
                                                 BOOl=False
@@ -562,8 +562,8 @@ def searchwords():
                                                 # print(ww[i+b])
                                                 # print(ww[i+a+b])
                                                 fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+b+1])) 
-                                                dictcount[ww[i:i+b+1]]+=1
+                                                fsent.write(str(ww[i:i+a+b+1])) 
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 negperfcnt+=1
                                                 i=i+a+b 
                                                 BOOl=False
@@ -572,7 +572,7 @@ def searchwords():
                                             elif "." in negperfdict[ww[i+b]]: 
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+b+1]))
-                                                dictcount[ww[i:i+b+1]]+=1
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 negperfcnt+=1
                                                 i=i+b
                                                 BOOL=False
@@ -605,7 +605,7 @@ def searchwords():
                                                 # print(ww[i+a+b])
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+b+a+1]))  
-                                                dictcount[ww[i:i+b+a+1]]+=1
+                                                dictcount[str(ww[i:i+b+a+1])]+=1
                                                 i=i+a+b 
                                                 negperfcnt+=1
                                                 BOOl=False
@@ -621,10 +621,10 @@ def searchwords():
                                                 # print(ww[i+b])
                                                 # print(ww[i+a+b])
                                                 fsent.write("doubleneg")                                                
-                                                fsent.write(str(ww[i:i+b+1]))   
-                                                dictcount[ww[i:i+b+1]]+=1
+                                                fsent.write(str(ww[i:i+a+b+1]))   
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
-                                                pospercnt+=1
+                                                posperfcnt+=1
                                                 BOOl=False
                                                 break 
 
@@ -635,7 +635,7 @@ def searchwords():
                                                 # print(ww[i+a+b])
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
                                                 negperfcnt+=1
                                                 BOOl=False
@@ -648,7 +648,8 @@ def searchwords():
                                             if ww[i+b] in amplifierset:
                                                 negperfcnt+=1
                                                 fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))                                             
+                                                fsent.write(str(ww[i:i+a+b+1]))  
+                                                dictcount[str(ww[i:i+a+b+1])]+=1                                           
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
@@ -656,7 +657,7 @@ def searchwords():
                                                 posperfcnt+=1
                                                 fsent.write("positive")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
@@ -664,7 +665,7 @@ def searchwords():
                                                 negperfcnt+=1
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
@@ -677,7 +678,7 @@ def searchwords():
                                             if ww[i+a+b] in amplifierset: 
                                                 fsent.write("positive")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
                                                 posperfcnt+=1
                                                 BOOl=False
@@ -687,7 +688,7 @@ def searchwords():
                                                 #print(ww[i:i+a+b+1]) 
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))    
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
                                                 negperfcnt+=1
                                                 BOOl=False
@@ -696,7 +697,7 @@ def searchwords():
                                                 #print(ww[i:i+a+b+1]) 
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
                                                 negperfcnt+=1
                                                 BOOl=False
@@ -706,25 +707,25 @@ def searchwords():
                                             if ww[i+b] in amplifierset:
                                                 negperfcnt+=1
                                                 fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))      
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                fsent.write(str(ww[i:i+b+1]))      
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
                                             if ww[i+b] in negatorset:
                                                 posperfcnt+=1
                                                 fsent.write("doubleneg")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))    
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                fsent.write(str(ww[i:i+b+1]))    
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
                                                 BOOl=False
                                                 break
                                             if ww[i+b] in badset:
                                                 fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))                                                     
+                                                fsent.write(str(ww[i:i+b+1]))                                                     
                                                 negperfcnt+=1
-                                                dictcount[ww[i:i+a+b+1]]+=1
+                                                dictcount[str(ww[i:i+b+1])]+=1
                                                 #print(ww[i:i+b+a+1]) 
                                                 i=i+b+a
                                                 BOOl=False
@@ -733,8 +734,12 @@ def searchwords():
                 
                     if posperfcnt>negperfcnt: 
                         possent=1
+                    else: 
+                        possent=0
                     if posperfcnt<negperfcnt: 
                         neggsent=1
+                    else: 
+                        neggsent=0
                     neggsentcount.append(neggsent)
                     possentcount.append(possent)
                     positiveperformancesent.append(posperfcnt)
