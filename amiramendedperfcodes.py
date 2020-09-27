@@ -74,9 +74,10 @@ os.chdir("/Users/lucy/Desktop/assortedcodes/builddic")
 corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
 negator="/Users/lucy/Desktop/assortedcodes/builddic/negatorfinal.csv"
 amplifier="/Users/lucy/Desktop/assortedcodes/builddic/amplifiedfinal.csv"
-negative="/Users/lucy/Desktop/assortedcodes/builddic/negativeperf.csv"
-positive="/Users/lucy/Desktop/assortedcodes/builddic/positiveperfcsv.csv"
+negative="/Users/lucy/Desktop/negativelemma.csv"
+positive="/Users/lucy/Desktop/positivelemma.csv"
 bad="/Users/lucy/Desktop/assortedcodes/builddic/bad.csv"
+good="/Users/lucy/Desktop/assortedcodes/builddic/good.csv"
 
 
 ######################        YOUR OUTPUT FILES            #####################
@@ -95,6 +96,7 @@ negperfdict=defaultdict(list)
 amplifierset=set()
 negatorset=set()
 badset=set()
+goodset=set()
 
 o=[]
 p=[]
@@ -129,8 +131,8 @@ def combine2():
     o=[]
     p=[]
     amplifier="/Users/lucy/Desktop/assortedcodes/builddic/amplifiedfinal.csv"
-    negative="/Users/lucy/Desktop/assortedcodes/builddic/negativeperf.csv"
-    positive="/Users/lucy/Desktop/assortedcodes/builddic/positiveperfcsv.csv"
+    negative="/Users/lucy/Desktop/negativelemma.csv"
+    positive="/Users/lucy/Desktop/positivelemma.csv"
     os.chdir("/Users/lucy/Desktop/assortedcodes/builddic")
     posperflist=[]
     with open(positive,"r") as posfile: 
@@ -165,6 +167,13 @@ def combine2():
         for row in records1:
             badf1=row[0].lower()
             badset.add(badf1)
+
+
+    with open(good,"r") as goodf: 
+        records1=csv.reader(goodf)
+        for row in records1:
+            goodf1=row[0].lower()
+            badset.add(goodf1)
 
 
     with open(amplifier,"r") as ampfile: 
@@ -428,6 +437,172 @@ def searchwords():
                         for b in range(1,3):
                             for a in range(1,3):
                                 if BOOL:
+
+                                    if negperfdict.get(ww[i].lower()) and i+a+b<len(ww): 
+                                        #print(i+b)
+                                        #print(len(ww))
+                                        # if b(i,a,b,ww,amplifierset,negperfcnt,BOOL) is not None: 
+                                        #     negperfcnt,BOOL,i=b(i,a,b,ww,amplifierset,negperfcnt,BOOL)
+                                        
+                                        
+                                        if ww[i+b] in negperfdict[ww[i].lower()]:
+                                            #if negperfdict[ww[i+b]] is not None:
+                                            if ww[i+a+b] in amplifierset: 
+                                                # print(ww[i:i+a+b+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+b+a+1]))  
+                                                dictcount[str(ww[i:i+b+a+1])]+=1
+                                                i=i+a+b 
+                                                negperfcnt+=1
+                                                BOOl=False
+                                                break 
+                                        
+                                       
+                                        # elif b(i,a,b,ww,negatorset,posperfcnt,BOOL) is not None:
+                                        #     posperfcnt,BOOL,i=b(i,a,b,ww,negatorset,posperfcnt,BOOL)
+                                        
+                                            elif ww[i+a+b] in negatorset: 
+                                                # print(ww[i:i+a+b+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                fsent.write("doubleneg")                                                
+                                                fsent.write(str(ww[i:i+a+b+1]))   
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
+                                                i=i+a+b 
+                                                posperfcnt+=1
+                                                BOOl=False
+                                                break 
+
+                                            elif ww[i+a+b] in badset: 
+                                                # print(ww[i:i+a+b+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+a+b+1]))
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
+                                                i=i+a+b 
+                                                negperfcnt+=1
+                                                BOOl=False
+                                                break 
+
+                                            elif ww[i+a+b] in goodset: 
+                                                # print(ww[i:i+a+b+1]) 
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                fsent.write("positive")                                                
+                                                fsent.write(str(ww[i:i+a+b+1]))
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
+                                                i=i+a+b 
+                                                posperfcnt+=1
+                                                BOOl=False
+                                                break 
+                                      
+                                        #elif b(i,a,b,ww,negatorset,posperfcnt,BOOL):
+
+                                        elif "." in negperfdict[ww[i].lower()]:
+                                            if ww[i+b] in amplifierset:
+                                                negperfcnt+=1
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+b+1]))  
+                                                dictcount[str(ww[i:i+b+1])]+=1                                           
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in negatorset:
+                                                posperfcnt+=1
+                                                fsent.write("positive")                                                
+                                                fsent.write(str(ww[i:i+b+1]))  
+                                                dictcount[str(ww[i:i+b+1])]+=1    
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in badset:
+                                                negperfcnt+=1
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+b+1]))  
+                                                dictcount[str(ww[i:i+b+1])]+=1    
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in goodset:
+                                                posperdict+=1
+                                                fsent.write("positive")                                                
+                                                fsent.write(str(ww[i:i+b+1]))  
+                                                dictcount[str(ww[i:i+b+1])]+=1    
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+
+
+                                    if posperdict.get(ww[i].lower()) and i+a+b<len(ww): 
+                                        if ww[i+b] in posperdict[ww[i].lower()]:
+                                            #if negperfdict[ww[i+b]] is not None:
+                                            if ww[i+a+b] in amplifierset: 
+                                                fsent.write("positive")                                                
+                                                fsent.write(str(ww[i:i+a+b+1]))  
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
+                                                i=i+a+b 
+                                                posperfcnt+=1
+                                                BOOl=False
+                                                break 
+                                            
+                                            elif ww[i+a+b] in negatorset: 
+                                                #print(ww[i:i+a+b+1]) 
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+a+b+1]))    
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
+                                                i=i+a+b 
+                                                negperfcnt+=1
+                                                BOOl=False
+                                                break 
+                                            elif ww[i+a+b] in badset: 
+                                                #print(ww[i:i+a+b+1]) 
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+a+b+1]))  
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
+                                                i=i+a+b 
+                                                negperfcnt+=1
+                                                BOOl=False
+                                                break 
+                                            
+                                        elif "." in negperfdict[ww[i].lower()]:
+                                            if ww[i+b] in amplifierset:
+                                                negperfcnt+=1
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+b+1]))      
+                                                dictcount[str(ww[i:i+b+1])]+=1
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in negatorset:
+                                                posperfcnt+=1
+                                                fsent.write("doubleneg")                                                
+                                                fsent.write(str(ww[i:i+b+1]))    
+                                                dictcount[str(ww[i:i+b+1])]+=1
+                                                #print(ww[i:i+b+a+1]) 
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in badset:
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+b+1]))                                                     
+                                                negperfcnt+=1
+                                                dictcount[str(ww[i:i+b+1])]+=1
+                                                #print(ww[i:i+b+a+1]) 
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+
+
+
+
+
                                     if ww[i].lower() in negatorset and i+a+b<len(ww) :
                                         if negperfdict.get(ww[i+b]):
                                             if ww[i+a+b] in negperfdict[ww[i+b]]: 
@@ -471,7 +646,7 @@ def searchwords():
                                                 break
                                             
 
-                                    elif ww[i].lower() in amplifierset and i+a+b<len(ww): 
+                                    if ww[i].lower() in amplifierset and i+a+b<len(ww): 
                                         if posperdict.get(ww[i+b]):
 
                                             if ww[i+a+b] in posperdict[ww[i+b]]: 
@@ -520,7 +695,7 @@ def searchwords():
                                                 BOOL=False
                                                 break
                                         
-                                    elif ww[i].lower() in badset and i+a+b<len(ww): 
+                                    if ww[i].lower() in badset and i+a+b<len(ww): 
                                         if posperdict.get(ww[i+b]):
                                             # if c(i,a,b,ww,posperdict,posperfcnt,BOOL) is not None: 
                                             #     posperfcnt,BOOL,i=c(i,a,b,ww,posperdict,posperfcnt,BOOL)
@@ -589,147 +764,7 @@ def searchwords():
                                             #     break
                                             
 
-                                    elif negperfdict.get(ww[i].lower()) and i+a+b<len(ww): 
-                                        #print(i+b)
-                                        #print(len(ww))
-                                        # if b(i,a,b,ww,amplifierset,negperfcnt,BOOL) is not None: 
-                                        #     negperfcnt,BOOL,i=b(i,a,b,ww,amplifierset,negperfcnt,BOOL)
-                                        
-                                        
-                                        if ww[i+b] in negperfdict[ww[i].lower()]:
-                                            #if negperfdict[ww[i+b]] is not None:
-                                            if ww[i+a+b] in amplifierset: 
-                                                # print(ww[i:i+a+b+1]) 
-                                                # print(ww[i])
-                                                # print(ww[i+b])
-                                                # print(ww[i+a+b])
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+b+a+1]))  
-                                                dictcount[str(ww[i:i+b+a+1])]+=1
-                                                i=i+a+b 
-                                                negperfcnt+=1
-                                                BOOl=False
-                                                break 
-                                        
-                                       
-                                        # elif b(i,a,b,ww,negatorset,posperfcnt,BOOL) is not None:
-                                        #     posperfcnt,BOOL,i=b(i,a,b,ww,negatorset,posperfcnt,BOOL)
-                                        
-                                            elif ww[i+a+b] in negatorset: 
-                                                # print(ww[i:i+a+b+1]) 
-                                                # print(ww[i])
-                                                # print(ww[i+b])
-                                                # print(ww[i+a+b])
-                                                fsent.write("doubleneg")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))   
-                                                dictcount[str(ww[i:i+a+b+1])]+=1
-                                                i=i+a+b 
-                                                posperfcnt+=1
-                                                BOOl=False
-                                                break 
-
-                                            elif ww[i+a+b] in badset: 
-                                                # print(ww[i:i+a+b+1]) 
-                                                # print(ww[i])
-                                                # print(ww[i+b])
-                                                # print(ww[i+a+b])
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))
-                                                dictcount[str(ww[i:i+a+b+1])]+=1
-                                                i=i+a+b 
-                                                negperfcnt+=1
-                                                BOOl=False
-                                                break 
-                                      
-
-                                        #elif b(i,a,b,ww,negatorset,posperfcnt,BOOL):
-
-                                        elif "." in negperfdict[ww[i].lower()]:
-                                            if ww[i+b] in amplifierset:
-                                                negperfcnt+=1
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[str(ww[i:i+a+b+1])]+=1                                           
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            if ww[i+b] in negatorset:
-                                                posperfcnt+=1
-                                                fsent.write("positive")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[str(ww[i:i+a+b+1])]+=1
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            if ww[i+b] in badset:
-                                                negperfcnt+=1
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[str(ww[i:i+a+b+1])]+=1
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            
-
-
-                                    elif  posperdict.get(ww[i].lower()) and i+a+b<len(ww): 
-                                        if ww[i+b] in posperdict[ww[i].lower()]:
-                                            #if negperfdict[ww[i+b]] is not None:
-                                            if ww[i+a+b] in amplifierset: 
-                                                fsent.write("positive")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[str(ww[i:i+a+b+1])]+=1
-                                                i=i+a+b 
-                                                posperfcnt+=1
-                                                BOOl=False
-                                                break 
-                                            
-                                            elif ww[i+a+b] in negatorset: 
-                                                #print(ww[i:i+a+b+1]) 
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))    
-                                                dictcount[str(ww[i:i+a+b+1])]+=1
-                                                i=i+a+b 
-                                                negperfcnt+=1
-                                                BOOl=False
-                                                break 
-                                            elif ww[i+a+b] in badset: 
-                                                #print(ww[i:i+a+b+1]) 
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+a+b+1]))  
-                                                dictcount[str(ww[i:i+a+b+1])]+=1
-                                                i=i+a+b 
-                                                negperfcnt+=1
-                                                BOOl=False
-                                                break 
-                                            
-                                        elif "." in negperfdict[ww[i].lower()]:
-                                            if ww[i+b] in amplifierset:
-                                                negperfcnt+=1
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+b+1]))      
-                                                dictcount[str(ww[i:i+b+1])]+=1
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            if ww[i+b] in negatorset:
-                                                posperfcnt+=1
-                                                fsent.write("doubleneg")                                                
-                                                fsent.write(str(ww[i:i+b+1]))    
-                                                dictcount[str(ww[i:i+b+1])]+=1
-                                                #print(ww[i:i+b+a+1]) 
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            if ww[i+b] in badset:
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+b+1]))                                                     
-                                                negperfcnt+=1
-                                                dictcount[str(ww[i:i+b+1])]+=1
-                                                #print(ww[i:i+b+a+1]) 
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
+                                   
                         i+=1
                 
                     if posperfcnt>negperfcnt: 
@@ -790,13 +825,14 @@ posall=[]
 negall=[]
 positiveoverall=[]
 negativeoverall=[]
+numberofsentences=[]
 
 #print(len(f1))
 
 def finalcount(f1):
     a=0 
-    f1=searchwords()
-    print(len(f1))
+    #f1=searchwords()
+    #print(len(f1))
     f_out2 = open(csv2, 'w')
     wr2 = csv.writer(f_out2)
     pos=0
@@ -807,6 +843,9 @@ def finalcount(f1):
     lmneg=0
     poscount=0
     negcount=0
+    sentencescount=0
+    
+
 
     with open(csv1,"r") as csvfile: 
 
@@ -844,12 +883,17 @@ def finalcount(f1):
                     lmnegoverall.append(lmneg)
                     positiveoverall.append(poscount)
                     negativeoverall.append(negcount)
+                    numberofsentences.append(sentencescount)
+
                 pos=0
                 neg=0
                 l=0
                 doubleneg=0
                 lmpos=0
                 lmneg=0
+                poscount=0
+                negcount=0
+                sentencescount=0
 
             if row[2].isdigit():
                 pos+=int(row[2])
@@ -864,9 +908,10 @@ def finalcount(f1):
             if row[7].isdigit():
                 lmneg+=int(row[7])
             if row[8].isdigit():
-                poscount+=int(row[6])
+                poscount+=int(row[8])
             if row[9].isdigit():
-                negcount+=int(row[7])                
+                negcount+=int(row[9])
+            sentencescount+=1          
             """
             if "1" in row[2] and "1" in row[4]: 
                 posint=posint+1
@@ -880,8 +925,8 @@ def finalcount(f1):
             """ 
 
             
-    p=zip(filenamelist,yearlist,ciklist,poslist,neglist,doublenegall,lmposoverall,lmnegoverall,llist,positiveoverall,negativeoverall) 
-    wr2.writerow(["filename","year","cik","pos","neg","doublenegall","lmpositive","lmnegative","l"])
+    p=zip(filenamelist,yearlist,ciklist,poslist,neglist,doublenegall,lmposoverall,lmnegoverall,llist,positiveoverall,negativeoverall,numberofsentences) 
+    wr2.writerow(["filename","year","cik","pos","neg","doublenegall","lmpositive","lmnegative","l","poscount","negcount","sentences"])
     for row in p:
         wr2.writerow(row)
 
