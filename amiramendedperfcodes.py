@@ -85,7 +85,7 @@ good="/Users/lucy/Desktop/assortedcodes/builddic/good.csv"
 #csv1 outputs metrics per sentence
 csv1="/Users/lucy/Desktop/assortedcodes/builddic/name1.csv"
 #csv2 outputs metrics per document
-csv2="/Users/lucy/Desktop//assortedcodes/builddic/name2.csv"
+csv2="/Users/lucy/Desktop//assortedcodes/builddic/name3.csv"
 #Output file with all sentence matches
 direct="/Users/lucy/Desktop/assortedcodes/assortedcodes/examplesentences0.txt"
 
@@ -173,7 +173,7 @@ def combine2():
         records1=csv.reader(goodf)
         for row in records1:
             goodf1=row[0].lower()
-            badset.add(goodf1)
+            goodset.add(goodf1)
 
 
     with open(amplifier,"r") as ampfile: 
@@ -337,7 +337,7 @@ def searchwords():
 
     
 
-    sentlog_outputfields=["filename","sentnolist","positiveperformancesent","negativeperformancesent","negneg","sentlen","LMpos","LMneg","poscount","negcount"]
+    sentlog_outputfields=["filename","sentnolist","positiveperformancesent","negativeperformancesent","positivewordscount","negativewordscount","doublenegsent","sentlen","LMposall","LMnegall","positiveLMlist","negativeLMlist","possentcount","neggsentcount"]
 
 
     externalsent=[]
@@ -355,6 +355,11 @@ def searchwords():
     LMnegall=[]
     possentcount=[]
     neggsentcount=[]
+    positivewordscount=[]
+    negativewordscount=[]
+    positiveLMlist=[]
+    negativeLMlist=[]
+
     dictcount=defaultdict(int)
 
     item="FILED AS OF DATE:"
@@ -402,9 +407,13 @@ def searchwords():
             LMpos=0
             LMneg=0
             sentno=0
+            negativewordscnt=0
+            positivewordscnt=0
             for sentences in sent: # ISSUE: need to identify individual words, modify to match regex words
                 #print(sentences)
-                
+                if "liquidity and capital resources" in sentences:
+                    print("Y") 
+                    continue
                 sentno+=1
                 fsent.write(files)
                 fsent.write(str(sentno))
@@ -434,8 +443,8 @@ def searchwords():
                     
                     while i+a+b<len(ww):
                         BOOL=True
-                        for b in range(1,3):
-                            for a in range(1,3):
+                        for b in range(1,4):
+                            for a in range(1,4):
                                 if BOOL:
 
                                     if negperfdict.get(ww[i].lower()) and i+a+b<len(ww): 
@@ -457,6 +466,7 @@ def searchwords():
                                                 dictcount[str(ww[i:i+b+a+1])]+=1
                                                 i=i+a+b 
                                                 negperfcnt+=1
+                                                negativewordscnt+=sum([a,b])
                                                 BOOl=False
                                                 break 
                                         
@@ -474,6 +484,7 @@ def searchwords():
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
                                                 posperfcnt+=1
+                                                positivewordscnt+=sum([a,b])
                                                 BOOl=False
                                                 break 
 
@@ -487,6 +498,7 @@ def searchwords():
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
                                                 negperfcnt+=1
+                                                negativewordscnt+=sum([a,b])
                                                 BOOl=False
                                                 break 
 
@@ -500,44 +512,51 @@ def searchwords():
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
                                                 posperfcnt+=1
+                                                positivewordscnt+=sum([a,b])
                                                 BOOl=False
                                                 break 
                                       
                                         #elif b(i,a,b,ww,negatorset,posperfcnt,BOOL):
 
-                                        elif "." in negperfdict[ww[i].lower()]:
-                                            if ww[i+b] in amplifierset:
-                                                negperfcnt+=1
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+b+1]))  
-                                                dictcount[str(ww[i:i+b+1])]+=1                                           
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            if ww[i+b] in negatorset:
-                                                posperfcnt+=1
-                                                fsent.write("positive")                                                
-                                                fsent.write(str(ww[i:i+b+1]))  
-                                                dictcount[str(ww[i:i+b+1])]+=1    
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            if ww[i+b] in badset:
-                                                negperfcnt+=1
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+b+1]))  
-                                                dictcount[str(ww[i:i+b+1])]+=1    
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            if ww[i+b] in goodset:
-                                                posperdict+=1
-                                                fsent.write("positive")                                                
-                                                fsent.write(str(ww[i:i+b+1]))  
-                                                dictcount[str(ww[i:i+b+1])]+=1    
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
+                                        elif "." in negperfdict[ww[i].lower()] and b==3:
+                                            # changed to reflect greedy appraoch 28 Sept
+                                            for x in range(1,4):
+                                                if ww[i+x] in amplifierset:
+                                                    negperfcnt+=1
+                                                    fsent.write("negative")                                                
+                                                    fsent.write(str(ww[i:i+x+1]))  
+                                                    dictcount[str(ww[i:i+x+1])]+=1   
+                                                    negativewordscnt+=x                           
+                                                    i=i+x
+                                                    BOOl=False
+                                                    break
+                                                if ww[i+x] in negatorset:
+                                                    posperfcnt+=1
+                                                    fsent.write("positive")                                                
+                                                    fsent.write(str(ww[i:i+x+1]))  
+                                                    dictcount[str(ww[i:i+x+1])]+=1
+                                                    positivewordscnt+=x
+                                                    i=i+x
+                                                    BOOl=False
+                                                    break
+                                                if ww[i+x] in badset:
+                                                    negperfcnt+=1
+                                                    fsent.write("negative")                                                
+                                                    fsent.write(str(ww[i:i+x+1]))  
+                                                    dictcount[str(ww[i:i+x+1])]+=1 
+                                                    negativewordscnt+=x 
+                                                    i=i+x
+                                                    BOOl=False
+                                                    break
+                                                if ww[i+x] in goodset:
+                                                    posperfcnt+=1
+                                                    fsent.write("positive")                                                
+                                                    fsent.write(str(ww[i:i+x+1]))  
+                                                    dictcount[str(ww[i:i+x+1])]+=1  
+                                                    positivewordscnt+=x
+                                                    i=i+x
+                                                    BOOl=False
+                                                    break
 
 
                                     if posperdict.get(ww[i].lower()) and i+a+b<len(ww): 
@@ -549,6 +568,7 @@ def searchwords():
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
                                                 i=i+a+b 
                                                 posperfcnt+=1
+                                                positivewordscnt+=sum([a,b])
                                                 BOOl=False
                                                 break 
                                             
@@ -557,6 +577,7 @@ def searchwords():
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))    
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
+                                                negativewordscnt+=sum([a,b])
                                                 i=i+a+b 
                                                 negperfcnt+=1
                                                 BOOl=False
@@ -566,41 +587,65 @@ def searchwords():
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))  
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
+                                                negativewordscnt+=sum([a,b])
                                                 i=i+a+b 
                                                 negperfcnt+=1
                                                 BOOl=False
                                                 break 
-                                            
-                                        elif "." in negperfdict[ww[i].lower()]:
-                                            if ww[i+b] in amplifierset:
-                                                negperfcnt+=1
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+b+1]))      
-                                                dictcount[str(ww[i:i+b+1])]+=1
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-                                            if ww[i+b] in negatorset:
+
+                                            elif ww[i+a+b] in goodset: 
+                                                #print(ww[i:i+a+b+1]) 
+                                                fsent.write("positive")                                                
+                                                fsent.write(str(ww[i:i+a+b+1]))  
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
+                                                i=i+a+b 
+                                                positivewordscnt+=sum([a,b])
                                                 posperfcnt+=1
-                                                fsent.write("doubleneg")                                                
-                                                fsent.write(str(ww[i:i+b+1]))    
-                                                dictcount[str(ww[i:i+b+1])]+=1
-                                                #print(ww[i:i+b+a+1]) 
-                                                i=i+b+a
                                                 BOOl=False
-                                                break
-                                            if ww[i+b] in badset:
-                                                fsent.write("negative")                                                
-                                                fsent.write(str(ww[i:i+b+1]))                                                     
-                                                negperfcnt+=1
-                                                dictcount[str(ww[i:i+b+1])]+=1
-                                                #print(ww[i:i+b+a+1]) 
-                                                i=i+b+a
-                                                BOOl=False
-                                                break
-
-
-
+                                                break 
+                                            
+                                        elif "." in negperfdict[ww[i].lower()] and b==3:
+                                            for x in range(1,4):
+                                                if ww[i+x] in amplifierset:
+                                                    negperfcnt+=1
+                                                    fsent.write("negative")                                                
+                                                    fsent.write(str(ww[i:i+x+1]))      
+                                                    dictcount[str(ww[i:i+x+1])]+=1
+                                                    negativewordscnt+=sum([a,b])
+                                                    negativewordscnt+=x
+                                                    i=i+x
+                                                    BOOl=False
+                                                    break
+                                                if ww[i+x] in negatorset:
+                                                    posperfcnt+=1
+                                                    fsent.write("doubleneg")                                                
+                                                    fsent.write(str(ww[i:i+x+1]))    
+                                                    dictcount[str(ww[i:i+x+1])]+=1
+                                                    positivewordscnt+=x
+                                                    #print(ww[i:i+b+a+1]) 
+                                                    i=i+x
+                                                    BOOl=False
+                                                    break
+                                                if ww[i+x] in badset:
+                                                    fsent.write("negative")                                                
+                                                    fsent.write(str(ww[i:i+x+1]))                                                     
+                                                    negperfcnt+=1
+                                                    dictcount[str(ww[i:i+x+1])]+=1
+                                                    #print(ww[i:i+b+a+1]) 
+                                                    negativewordscnt+=x
+                                                    i=i+x
+                                                    BOOl=False
+                                                    break
+                                                if ww[i+x] in goodset:
+                                                    fsent.write("positive")                                                
+                                                    fsent.write(str(ww[i:i+x+1]))                                                     
+                                                    posperfcnt+=1
+                                                    dictcount[str(ww[i:i+x+1])]+=1
+                                                    positivewordscnt+=x
+                                                    #print(ww[i:i+b+a+1]) 
+                                                    i=i+x
+                                                    BOOl=False
+                                                    break
 
 
                                     if ww[i].lower() in negatorset and i+a+b<len(ww) :
@@ -611,6 +656,7 @@ def searchwords():
                                                 #freq count increment
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
                                                 # alternative sol
+                                                positivewordscnt+=sum([a,b])
                                                 posperfcnt+=1
                                                 i=i+a+b 
                                                 BOOl=False
@@ -622,6 +668,7 @@ def searchwords():
                                                 dictcount[str(ww[i:i+b+1])]+=1
                                                 posperfcnt+=1
                                                 i=i+b
+                                                negativewordscnt+=b
                                                 BOOl=False
                                                 break
                                           
@@ -633,6 +680,7 @@ def searchwords():
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
                                                 negperfcnt+=1
                                                 i=i+a+b 
+                                                negativewordscnt+=sum([a,b])
                                                 BOOl=False
                                                 break 
 
@@ -640,6 +688,7 @@ def searchwords():
                                                 fsent.write("negative")
                                                 fsent.write(str(ww[i:i+b+1]))
                                                 dictcount[str(ww[i:i+b+1])]+=1
+                                                negativewordscnt+=sum([a,b])
                                                 negperfcnt+=1
                                                 i=i+b
                                                 BOOl=False
@@ -653,6 +702,7 @@ def searchwords():
                                                 fsent.write("positive")                                                
                                                 fsent.write(str(ww[i:i+a+b+1]))
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
+                                                positivewordscnt+=sum([a,b])
                                                 posperfcnt+=1
                                                 i=i+a+b
                                                 BOOl=False
@@ -662,6 +712,7 @@ def searchwords():
                                                 fsent.write("positive")                                                
                                                 fsent.write(str(ww[i:i+b+1]))
                                                 dictcount[str(ww[i:i+b+1])]+=1
+                                                positivewordscnt+=b
                                                 posperfcnt+=1                                      
                                                 i=i+b
                                                 BOOl=False
@@ -682,6 +733,7 @@ def searchwords():
                                                 fsent.write(str(ww[i:i+a+b+1]))
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
                                                 negperfcnt+=1 
+                                                negativewordscnt+=sum([a,b])
                                                 i=i+a+b 
                                                 BOOl=False
                                                 break 
@@ -691,6 +743,7 @@ def searchwords():
                                                 fsent.write(str(ww[i:i+b+1]))  
                                                 dictcount[str(ww[i:i+b+1])]+=1
                                                 negperfcnt+=1
+                                                negativewordscnt+=b
                                                 i=i+b
                                                 BOOL=False
                                                 break
@@ -713,6 +766,7 @@ def searchwords():
                                                 dictcount[str(ww[i:i+b+a+1])]+=1
                                                 negperfcnt+=1
                                                 i=i+a+b 
+                                                negativewordscnt+=sum([a,b])
                                                 BOOl=False
                                                 break
 
@@ -720,6 +774,7 @@ def searchwords():
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+b+1]))
                                                 dictcount[str(ww[i:i+b+1])]+=1
+                                                negativewordscnt+=b
                                                 negperfcnt+=1                                         
                                                 i=i+b
                                                 BOOl=False
@@ -740,6 +795,7 @@ def searchwords():
                                                 fsent.write(str(ww[i:i+a+b+1])) 
                                                 dictcount[str(ww[i:i+a+b+1])]+=1
                                                 negperfcnt+=1
+                                                negativewordscnt+=sum([a,b])
                                                 i=i+a+b 
                                                 BOOl=False
                                                 break 
@@ -748,11 +804,76 @@ def searchwords():
                                                 fsent.write("negative")                                                
                                                 fsent.write(str(ww[i:i+b+1]))
                                                 dictcount[str(ww[i:i+b+1])]+=1
+                                                negativewordscnt+=b
                                                 negperfcnt+=1
                                                 i=i+b
                                                 BOOL=False
                                                 break
+
+
+                                    if ww[i].lower() in goodset and i+a+b<len(ww): 
+                                        if posperdict.get(ww[i+b]):
+                                            # if c(i,a,b,ww,posperdict,posperfcnt,BOOL) is not None: 
+                                            #     posperfcnt,BOOL,i=c(i,a,b,ww,posperdict,posperfcnt,BOOL)
+                                            #     break
+
+                                           
+                                            #if negperfdict[ww[i+b]] is not None:
+                                            if ww[i+a+b] in posperdict[ww[i+b]]: 
+                                                    # print(ww[i:i+a+b+1])
+                                                    # print(ww[i])
+                                                    # print(ww[i+b])
+                                                    # print(ww[i+a+b])    
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+b+a+1]))    
+                                                dictcount[str(ww[i:i+b+a+1])]+=1
+                                                positivewordscnt+=sum([a,b])
+                                                posperfcnt+=1
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break
+
+                                            elif "." in posperdict[ww[i+b]]:
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+b+1]))
+                                                dictcount[str(ww[i:i+b+1])]+=1
+                                                positivewordscnt+=x
+                                                posperfcnt+=1                                         
+                                                i=i+b
+                                                BOOl=False
+                                                break
+                                            
+                                            
+                                            # elif c(i,a,b,ww,negperfdict,negperfcnt,BOOL) is not None: 
+                                            #     negperfcnt,BOOL,i=c(i,a,b,ww,negperfdict,negperfcnt,BOOL)
+                                            #     break
+
+                                        if negperfdict.get(ww[i+b]):  
+                                            if ww[i+a+b] in negperfdict[ww[i+b]]: 
+                                                # print(ww[i:i+a+b+1])
+                                                # print(ww[i])
+                                                # print(ww[i+b])
+                                                # print(ww[i+a+b])
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+a+b+1])) 
+                                                dictcount[str(ww[i:i+a+b+1])]+=1
+                                                positivewordscnt+=sum([a,b])
+                                                posperfcnt+=1
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in negperfdict[ww[i+b]]: 
+                                                fsent.write("negative")                                                
+                                                fsent.write(str(ww[i:i+b+1]))
+                                                dictcount[str(ww[i:i+b+1])]+=1
+                                                positivewordscnt+=x
+                                                posperfcnt+=1
+                                                i=i+b
+                                                BOOL=False
+                                                break
                                         
+                    
                     
                                             # else:
                                             #     #print(ww[i:i+b+a+1])   
@@ -775,6 +896,17 @@ def searchwords():
                         neggsent=1
                     else: 
                         neggsent=0
+
+
+                    if LMneg>LMpos: 
+                        positiveLM=1
+                    else: 
+                        positiveLM=0
+                    if LMneg<LMpos: 
+                        negativeLM=1
+                    else: 
+                        negativeLM=0
+
                     neggsentcount.append(neggsent)
                     possentcount.append(possent)
                     positiveperformancesent.append(posperfcnt)
@@ -782,11 +914,19 @@ def searchwords():
                     doublenegsent.append(doubleneg)
                     LMposall.append(LMpos)
                     LMnegall.append(LMneg)
+                    positivewordscount.append(positivewordscnt)
+                    negativewordscount.append(negativewordscnt)
+                    positiveLMlist.append(positiveLM)
+                    negativeLMlist.append(negativeLM)
+                    positivewordscnt=0
+                    negativewordscnt=0
                     posperfcnt=0
                     negperfcnt=0
                     doubleneg=0
                     LMpos=0
                     LMneg=0
+                    positiveLM=0
+                    negativeLM=0
                     sentlen.append(len(ww))
 
                 else:
@@ -798,7 +938,7 @@ def searchwords():
     
     sorted_x = sorted(dictcount.items(), key=operator.itemgetter(1))
     print(sorted_x)
-    p=zip(filename,sentnolist,positiveperformancesent,negativeperformancesent,doublenegsent,sentlen,LMposall,LMnegall,possentcount,neggsentcount)
+    p=zip(filename,sentnolist,positiveperformancesent,negativeperformancesent,positivewordscount,negativewordscount,doublenegsent,sentlen,LMposall,LMnegall,positiveLMlist,negativeLMlist,possentcount,neggsentcount)
     for row in p:
         wr.writerow(row)
     print(len(f1))
@@ -812,8 +952,6 @@ a=0
 
 poslist=[]
 neglist=[]
-
-
 filenamelist=[]
 yearlist=[]
 ciklist=[]
@@ -826,13 +964,19 @@ negall=[]
 positiveoverall=[]
 negativeoverall=[]
 numberofsentences=[]
+poswordcount=[]
+negwordcount=[]
+poswordcountlist=[]
+negwordcountlist=[]
+lmsentencespos=[]
+lmsentencesneg=[]
 
 #print(len(f1))
 
 def finalcount(f1):
     a=0 
-    #f1=searchwords()
-    #print(len(f1))
+    f1=searchwords()
+    print(len(f1))
     f_out2 = open(csv2, 'w')
     wr2 = csv.writer(f_out2)
     pos=0
@@ -841,7 +985,11 @@ def finalcount(f1):
     doubleneg=0
     lmpos=0
     lmneg=0
+    lmsentencespos=0
+    lmsentencesneg=0
     poscount=0
+    poswordcount=0
+    negwordcount=0
     negcount=0
     sentencescount=0
     
@@ -884,6 +1032,10 @@ def finalcount(f1):
                     positiveoverall.append(poscount)
                     negativeoverall.append(negcount)
                     numberofsentences.append(sentencescount)
+                    lmposoverall.append(lmsentencespos)
+                    lmnegoverall.append(lmsentencesneg)
+                    poswordcountlist.append(poswordcount)
+                    negwordcountlist.apoend(negwordcount)
 
                 pos=0
                 neg=0
@@ -894,23 +1046,36 @@ def finalcount(f1):
                 poscount=0
                 negcount=0
                 sentencescount=0
+                poswordcount=0
+                negwordcount=0
+                lmsentencespos=0
+                lmsentencesneg=0
 
             if row[2].isdigit():
-                pos+=int(row[2])
+                poswordcount+=int(row[2])
             if row[3].isdigit(): 
-                neg+=int(row[3])
+                negwordcount+=int(row[3])
             if row[4].isdigit():
-                doubleneg+=int(row[4])
-            if row[5].isdigit():
-                l+=int(row[5])
-            if row[6].isdigit():
-                lmpos+=int(row[6])
+                pos+=int(row[4])
+            if row[5].isdigit(): 
+                neg+=int(row[5])
+            #if row[4].isdigit():
+                #doubleneg+=int(row[4])
             if row[7].isdigit():
-                lmneg+=int(row[7])
+                l+=int(row[5])
             if row[8].isdigit():
-                poscount+=int(row[8])
+                lmpos+=int(row[8])
             if row[9].isdigit():
-                negcount+=int(row[9])
+                lmneg+=int(row[9])
+            if row[10].isdigit():
+                lmsentencespos+=int(row[10])
+            if row[11].isdigit():
+                lmsentencesneg+=int(row[11])
+            if row[12].isdigit():
+                poscount+=int(row[12])
+            if row[13].isdigit():
+                negcount+=int(row[13])
+
             sentencescount+=1          
             """
             if "1" in row[2] and "1" in row[4]: 
@@ -925,8 +1090,8 @@ def finalcount(f1):
             """ 
 
             
-    p=zip(filenamelist,yearlist,ciklist,poslist,neglist,doublenegall,lmposoverall,lmnegoverall,llist,positiveoverall,negativeoverall,numberofsentences) 
-    wr2.writerow(["filename","year","cik","pos","neg","doublenegall","lmpositive","lmnegative","l","poscount","negcount","sentences"])
+    p=zip(filenamelist,yearlist,ciklist,poslist,neglist,poswordcountlist,negwordcountlist,lmposoverall,lmnegoverall,lmsentencespos,lmsentencesneg,llist,positiveoverall,negativeoverall,numberofsentences) 
+    wr2.writerow(["filename","year","cik","pos","neg","poscount","negcount","lmpositive","lmnegative","lmpos","lmneg","l","poscount","negcount","sentences"])
     for row in p:
         wr2.writerow(row)
 
