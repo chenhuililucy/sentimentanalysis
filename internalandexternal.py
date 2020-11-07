@@ -1,0 +1,992 @@
+''' 
+This piece of code is used to generate weights of documents in four categories: posint,negint,posext,negext
+
+The first part of this piece of code permutes amplifier and negator with positive & negative performance words and write output to csv file. 
+
+##########################################################################################################################################
+
+Data Dependencies: 
+
+postperf.csv -------- csv with all positive performance ngrams 
+negperf.csv -------- csv with all negative performance ngrams  
+amplifier.csv  -------- csv with all amplifiers ngrams  
+negator.csv --------csv with all negators ngrams  
+
+##########################################################################################################################################
+This program outputs: 
+
+posperflist.csv -------- csv with amplifier & negator adjusted positive performance ngrams 
+negperflist.csv --------   csv with  amplifier & negator adjusted negative performance ngrams 
+
+
+'''
+
+corpus="/Users/lucy/Desktop/others/newdictestn/newdic/*.txt"
+csv1="/Users/lucy/Desktop/assortedcodes/builddic/internalandexternalsentences.csv"
+csv2="/Users/lucy/Desktop//assortedcodes/builddic/internalandexternaloutput.csv"
+
+
+
+#############################  MAIN  #########################################################################################
+
+
+#You need to have several csv files that store words we are looking for in the dictionary 
+#As with the termination of the second for loop, the csv file automatically closes, the first for loop would not run
+#The only way to do this is to store the dictionary as several dictionaries each with 1 column
+
+import re 
+import glob
+import os
+import csv
+import nltk 
+from collections import defaultdict
+from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.tokenize import RegexpTokenizer
+
+
+from nltk import ngrams
+
+
+
+
+#############################  MAIN  #########################################################################################
+
+
+#You need to have several csv files that store words we are looking for in the dictionary 
+#As with the termination of the second for loop, the csv file automatically closes, the first for loop would not run
+#The only way to do this is to store the dictionary as several dictionaries each with 1 column
+
+import re 
+import glob
+import os
+import csv
+import nltk 
+from collections import defaultdict
+from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.tokenize import RegexpTokenizer
+
+
+DEBUG=True 
+new=True
+
+negator="/Users/lucy/Desktop/assortedcodes/builddic/negatorfinal.csv"
+amplifier="/Users/lucy/Desktop/assortedcodes/builddic/amplifiedfinal.csv"
+negative="/Users/lucy/Desktop/assortedcodes/builddic/negativeperf.csv"
+positive="/Users/lucy/Desktop/assortedcodes/builddic/positiveperfcsv.csv"
+bad="/Users/lucy/Desktop/assortedcodes/builddic/bad.csv"
+os.chdir("/Users/lucy/Desktop/assortedcodes/builddic") 
+
+
+#########################################################################################################################################
+
+
+#positive performance csv is output by combining amplifier with postperf and negperf with negator
+
+posperdict=defaultdict(list)
+negperfdict=defaultdict(list)
+amplifierset=set()
+negatorset=set()
+badset=set()
+
+o=[]
+p=[]
+
+def combine2(): 
+    o=[]
+    p=[]
+    amplifier="/Users/lucy/Desktop/assortedcodes/builddic/amplifiedfinal.csv"
+    negative="/Users/lucy/Desktop/assortedcodes/builddic/negativeperf.csv"
+    positive="/Users/lucy/Desktop/assortedcodes/builddic/positiveperfcsv.csv"
+    os.chdir("/Users/lucy/Desktop/assortedcodes/builddic")
+    posperflist=[]
+    with open(positive,"r") as posfile: 
+        records=csv.reader(posfile)
+        for row in records:
+            posperf=row[0].lower()
+            if len(posperf.split(" "))>1: 
+                w1=posperf.split(" ")[0]
+                w2=posperf.split(" ")[1]
+            else: 
+                w1=posperf
+                w2="."
+            
+            posperdict[w1].append(w2)
+
+        #print(posperdict)
+
+
+    with open(negative,"r") as negfile: 
+        records=csv.reader(negfile)
+        for row in records:
+            negperf=row[0].lower()
+            if len(negperf.split(" "))>1: 
+                w1=negperf.split(" ")[0]
+                w2=negperf.split(" ")[1]
+            else: 
+                w1=negperf
+                w2="."
+            
+            negperfdict[w1].append(w2)
+
+
+                    #posperdict.update({w1:{w2:negator1}})
+                    #posperdict.update({negator1:{w1:w2}})
+
+
+    with open(bad,"r") as badf: 
+        records1=csv.reader(badf)
+        for row in records1:
+            badf1=row[0].lower()
+            badset.add(badf1)
+
+
+    with open(amplifier,"r") as ampfile: 
+        records1=csv.reader(ampfile)
+        for row in records1:
+            amplifier1=row[0].lower()
+            amplifierset.add(amplifier1)
+    
+    with open(negator,"r") as negfile: 
+        records1=csv.reader(negfile)
+        for row in records1:
+            negator1=row[0].lower()
+            negatorset.add(negator1)
+                
+##########################################################################################################################################
+
+"""
+
+part 2 will count if posperf,negperf,internal,external n-grams exist in every sentence of a file
+
+###################################################################################################################
+Data Dependencies:
+
+posperflist.csv -------- csv with amplifier & negator adjusted positive performance ngrams 
+negperflist.csv --------   csv with  amplifier & negator adjusted negative performance ngrams 
+int.csv -------- csv with internal ngrams 
+ext.csv -------- csv with external ngrams 
+
+
+###################################################################################################################
+Directory(User-specific directory to all scrubbed input MD&A files): 
+
+Corpus where all MD&A filings are stored  
+
+###################################################################################################################
+Output file: sentence.csv 
+
+# Want: for each sentence of of dictionary, write the no. of sentence in the doc 
+# For each no. of sentence, output field write posperf,negperf,internal,external 
+
+
+filename-------- write filename for every first sentence of the file, for the following sentences after the first, shows "none" 
+sentnolist-------- outputs the no. of the sentence in the file 
+posperfsent-------- outputs 1 or 0 depending on whether the sentence contains ngrams in posperflist.csv
+negperfsent-------- outputs 1 or 0 depending on whether the sentence contains ngrams in negperflist.csv
+internalsent-------- outputs 1 or 0 depending on whether the sentence contains ngrams in int.csv
+externalsent-------- outputs 1 or 0 depending on whether the sentence contains ngrams in ext.csv
+
+
+
+"""
+
+
+
+
+#This piece of code will output weights of documents in four categories:posint,negint,posext,negext
+#For each time a sentence of the above type occurs, we count one. 
+
+#You need to have several csv files that store words we are looking for in the dictionary 
+#As with the termination of the second for loop, the csv file automatically closes, the first for loop would not run
+#The only way to do this is to store the dictionary as several dictionaries each with 1 column
+  
+
+#key goal in this piece of code is to make stuff immutable 
+
+
+#load in positive performance word list
+
+
+
+                   ###################
+
+#Clean text
+
+def preprocess(sentence):
+    sentence=str(sentence)
+    #sentence = sentence.lower()
+    sentence=sentence.replace('{html}',"") 
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr, '', sentence)
+    rem_url=re.sub(r'http\S+', '',cleantext)
+    rem_num = re.sub('[0-9]+', '', rem_url)
+    tokenizer = RegexpTokenizer(r'\w+')
+    tokens = tokenizer.tokenize(rem_num)  
+    return " ".join(tokens)
+
+                   ###################
+
+
+
+direct="/Users/lucy/Desktop/assortedcodes/assortedcodes/examplesentences(1).txt"
+
+# def writesentences(): 
+
+#     if internal!=0 and positive!=0 and negative!=0 and external!=0: 
+#         fsent.write("int, ext, pos, neg \n")
+#     elif internal!=0 and positive!=0 and negative!=0: 
+#         fsent.write("int, pos, neg \n")
+#     elif internal!=0 and positive!=0 and external!=0: 
+#         fsent.write("int, pos, ext \n")
+#     elif external!=0 and positive!=0 and negative!=0: 
+#         fsent.write("ext, pos, neg \n")
+#     elif external!=0 and negative!=0 and external!=0: 
+#         fsent.write("int, pos, neg \n")
+#     elif internal!=0 and positive!=0 and external!=0: 
+#         fsent.write("int, pos, ext \n")
+#     elif internal!=0 and positive!=0: 
+#         fsent.write("int, pos \n")
+#     elif external!=0 and negative!=0: 
+#         fsent.write("ext, neg \n")
+#     elif internal!=0 and negative!=0: 
+#         fsent.write("int, pos \n")
+#     elif external!=0 and positive!=0: 
+#         fsent.write("ext, pos \n")
+#     fsent.write(sentences)
+
+
+#write output sentence file
+
+
+
+f1=[]
+
+                   ###################
+def searchwords(): 
+    global sentlist
+    if new:
+        combine2()
+    posperflist=[]
+    
+
+
+    ########
+
+    #LOAD LM 
+
+    with open("LMpositive.csv","r") as posfile: 
+    #with open("posperflist.csv","r") as posfile: 
+        poswords=csv.reader(posfile)
+        for row in poswords: 
+            singleposperword=row[0].lower()
+            posperflist.append(singleposperword)
+            #print(internalwordlist)
+
+    posperflist=set(posperflist)
+    #load in negative performance word list 
+
+    negperflist=[]
+    with open("LMnegative.csv","r") as negfile: 
+    #with open("negaperflist.csv","r") as negfile
+        negwords=csv.reader(negfile)
+        for row in negwords: 
+            singlenegperfword=row[0].lower()
+            negperflist.append(singlenegperfword)
+            #print(internalwordlist)
+    negperflist=set(negperflist)
+
+    ########
+
+    from collections import defaultdict
+
+
+    #def internal wordlist 
+
+    internaldict=defaultdict(list)
+
+
+    def merge(list1, list2): 
+        merged_list = [(list1[i], list2[i]) for i in range(0, len(list1))] 
+        return merged_list 
+
+
+    with open("internallemma.csv","r",errors="ignore") as internalfile: 
+        w1=[] 
+        w2=[]
+
+        internalwords=csv.reader(internalfile)
+        for row in internalwords: 
+            singleinternalword=row[0].lower()
+            if len(singleinternalword.split(" "))>1: 
+                w1.append(singleinternalword.split(" ")[0])
+                w2.append(singleinternalword.split(" ")[1])
+                #print(singleinternalword.split(" "))
+                #for word1, word2 in singleinternalword.split(" "):
+                #word1=singleinternalword.split(" ")[0]
+                #word2=singleinternalword.split(" ")[1]
+                #internaldict[word1].append(word2)
+                #internaldict.update({word1:word2})
+            else: 
+                word1=singleinternalword
+                internaldict.update({word1:""})
+        
+    for a, b in list(zip(w1, w2)):
+        if a not in internaldict: 
+            internaldict[a] = [b]
+        else:
+            if not isinstance(internaldict[a], str):
+                internaldict[a].append(b)
+        #internaldict.setdefault(a, []).append(b)
+
+            #print(internalwordlist)
+    
+
+    #def external wordlist 
+
+    externaldict=defaultdict(list)
+    with open("externallemma.csv","r",errors="ignore") as externalfile: 
+        w1=[]
+        w2=[]
+        externalwords=csv.reader(externalfile)
+        for row in externalwords: 
+            singleexternalwords=row[0].lower()
+            if len(singleexternalwords.split(" "))>1: 
+
+                w1.append(singleexternalwords.split(" ")[0])
+                w2.append(singleexternalwords.split(" ")[1])
+                #word1=singleexternalwords.split(" ")[0]
+                #word2=singleexternalwords.split(" ")[1]
+                #externaldict[word1].append(word2)
+                #externaldict.update({word1:word2})
+            else: 
+                word1=singleexternalwords
+                externaldict.update({word1:""})
+
+
+    for a, b in list(zip(w1, w2)):
+        if a not in externaldict: 
+            externaldict[a] = [b]
+        else:
+            if not isinstance(externaldict[a], str):
+                externaldict[a].append(b)
+            #print(externalwordlist)
+
+
+    externalsent=[]
+    internalsent=[]
+    posperfsent=[]
+    negperfsent=[]
+    positiveperformancesent=[]
+    negativeperformancesent=[]
+    sentnolist=[]
+    filename=[]
+    sentlist=[]
+    sentlen=[]
+
+    sentlog_outputfields=["filename","sentnolist","positiveperformancesent","negativeperformancesent","internalsent","externalsent"]
+    item="FILED AS OF DATE:"
+    filenum=1 #correct as filenum 
+
+    f_out=open(csv1,"w")
+    wr=csv.writer(f_out)
+    wr.writerow(sentlog_outputfields)
+    fsent=open(direct,"w")
+
+    for files in glob.glob(corpus):
+        print(files)
+        year=files[files.find("-")+1:files.find(".")]
+        cik=files[:files.find("-")]
+        with open(files) as f: 
+            content = f.read()
+            text1=content.lower()
+            matchedstring=""
+            for m in re.finditer(item.lower(), text1): 
+                if not m: 
+                    matchedstring="."
+                    raise Error
+                    #print(file)
+                else:
+                    substr1=text[m.start():m.start()+30]
+                    #print(substr1)
+                    # may be necessary to search for end string  
+                    i=0
+                    while i< len(substr1) and not substr1[i].isdigit(): 
+                        i+=1
+                    while i< len(substr1) and substr1[i].isdigit(): 
+                        matchedstring+=substr1[i]
+                        i+=1
+                    break
+            if matchedstring:
+                #print(matchedstring)
+                f1.append(matchedstring.strip())
+
+            totalnumberofsent=0
+            filenum=filenum+1 
+
+            re.sub("\n","",content)
+            sent = re.split('(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)(\s|[A-Z].*)',content)
+            #print(sent)
+            posperfcnt=0 
+            negperfcnt=0
+            doubleneg=0
+            
+            sentno=0
+            for sentences in sent: # ISSUE: need to identify individual words, modify to match regex words
+                #print(sentences)
+                sentno+=1
+                totalnumberofsent+=1
+
+                #sentences=preprocess(sentences)
+                endext=True 
+                endint=True 
+                endpos=True 
+                endneg=True
+                endposperf=True 
+                endnegperf=True 
+                #print(sentno)
+                #ww=word_tokenize(sentences)
+                ww=[]
+                for r in word_tokenize(sentences): 
+                    if r.isalpha(): 
+                        ww.append(r)
+
+                #print(ww)
+                #sentnolist.append(sentno)
+                if len(ww)>=1:
+                    #print(ww)
+                    #sentno+=1
+                    sentnolist.append(sentno)
+                    if sentno==1: 
+                        filename.append(files)
+                    else: 
+                        filename.append("none")
+
+                                    ################################################################################
+                    
+                                    ################################################################################
+                    a=0
+                    i=0
+                    b=0
+                    while i+a+b<len(ww):
+                        BOOL=True
+                        for b in range(1,3):
+                            for a in range(1,3):
+                                if BOOL: # stop incrementing a
+                                    if ww[i].lower() in negatorset and i+a+b<len(ww) :
+                                        if negperfdict.get(ww[i+b]):
+                                            if ww[i+a+b] in negperfdict[ww[i+b]]: 
+                                                print(ww[i:i+a+b+1])
+                                                print(ww[i])
+                                                print(ww[i+b])
+                                                print(ww[i+a+b])
+                                                posperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                endposperf=False
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in negperfdict[ww[i+b]] :
+
+                                                posperfcnt+=b
+                                                i=i+b
+                                                endposperf=False
+                                                BOOl=False
+                                                break
+                                        
+                                        if posperdict.get(ww[i+b]):
+
+                                            if ww[i+a+b] in posperdict[ww[i+b]]: 
+
+                                                negperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                endnegperf=False
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in posperdict[ww[i+b]] :
+
+                                                negperfcnt+=b
+                                                i=i+b
+                                                endnegperf=False
+                                                BOOl=False
+                                                break
+
+
+                                    elif ww[i].lower() in amplifierset and i+a+b<len(ww): 
+                                        if posperdict.get(ww[i+b]):
+
+                                            if ww[i+a+b] in posperdict[ww[i+b]]: 
+                                            
+                                                posperfcnt+=sum([a,b])
+                                                endposperf=False
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break
+
+                                            elif "." in posperdict[ww[i+b]]:
+                                                posperfcnt+=b                                         
+                                                i=i+b
+                                                endposperf=False
+                                                BOOl=False
+                                                break
+                                            
+
+                                        if negperfdict.get(ww[i+b]):  
+                                            if ww[i+a+b] in negperfdict[ww[i+b]]: 
+
+                                                negperfcnt+=sum([a,b])
+                                                endnegperf=False
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in negperfdict[ww[i+b]]: 
+                                                negperfcnt+=b 
+                                                i=i+b
+                                                BOOL=False
+                                                endnegperf=False
+                                                break
+                                        
+                                    elif ww[i].lower() in badset and i+a+b<len(ww): 
+                                        if posperdict.get(ww[i+b]):
+
+                                            if ww[i+a+b] in posperdict[ww[i+b]]: 
+                                            
+                                                negperfcnt+=sum([a,b])
+                                                i=i+a+b 
+                                                endnegperf=False
+                                                BOOl=False
+                                                break
+
+                                            elif "." in posperdict[ww[i+b]]:
+                                                negperfcnt+=b                                         
+                                                i=i+b
+                                                endnegperf=False
+                                                BOOl=False
+                                                break
+
+                                        if negperfdict.get(ww[i+b]):  
+                                            if ww[i+a+b] in negperfdict[ww[i+b]]: 
+
+                                                negperfcnt+=sum([a,b])
+                                                endnegperf=False
+                                                i=i+a+b 
+                                                BOOl=False
+                                                break 
+
+                                            elif "." in negperfdict[ww[i+b]]: 
+                                                negperfcnt+=b 
+                                                endnegperf=False
+                                                i=i+b
+                                                BOOL=False
+                                                break
+                                        
+                                            
+
+                                    elif negperfdict.get(ww[i].lower()) and i+a+b<len(ww): 
+
+                                        
+                                        if ww[i+b] in negperfdict[ww[i].lower()]:
+                                            if ww[i+a+b] in amplifierset: 
+                                                endnegperf=False
+                                                i=i+a+b 
+                                                negperfcnt+=a+b
+                                                BOOl=False
+                                                break 
+                                        
+                                    
+                                        # elif b(i,a,b,ww,negatorset,posperfcnt,BOOL) is not None:
+                                        #     posperfcnt,BOOL,i=b(i,a,b,ww,negatorset,posperfcnt,BOOL)
+                                        
+                                            elif ww[i+a+b] in negatorset: 
+                                                endnposperf=False
+                                                i=i+a+b 
+                                                posperfcnt+=a+b
+                                                BOOl=False
+                                                break 
+
+                                            elif ww[i+a+b] in badset: 
+                                                endnegperf=False
+                                                i=i+a+b 
+                                                negperfcnt+=a+b
+                                                BOOl=False
+                                                break 
+                                    
+
+                                        #elif b(i,a,b,ww,negatorset,posperfcnt,BOOL):
+
+                                        elif "." in negperfdict[ww[i].lower()]:
+                                            if ww[i+b] in amplifierset:
+                                                negperfcnt+=sum([b,a])
+                                                endnegperf=False
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in negatorset:
+                                                posperfcnt+=sum([b,a])
+                                                endposperf=False
+
+                                                i=i+b+a
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in badset:
+                                                negperfcnt+=sum([b,a])
+                                                print(ww[i])
+                                                print(ww[i+b])
+                                                print(ww[i+a+b])
+                                                #print(ww[i:i+b+a+1]) 
+                                                i=i+b+a
+                                                endnegperf=False
+
+                                                BOOl=False
+                                                break
+                                            
+
+
+                                    elif  posperdict.get(ww[i].lower()) and i+a+b<len(ww): 
+                                        if ww[i+b] in posperdict[ww[i].lower()]:
+                                            #if negperfdict[ww[i+b]] is not None:
+                                            if ww[i+a+b] in amplifierset: 
+                                                #print(ww[i:i+a+b+1]) 
+                                                i=i+a+b 
+                                                posperfcnt+=a+b
+                                                endposperf=False
+                                                BOOl=False
+                                                break 
+                                            
+                                            elif ww[i+a+b] in negatorset: 
+                                                #print(ww[i:i+a+b+1]) 
+                                                i=i+a+b 
+                                                negperfcnt+=a+b
+                                                endnegperf=False
+                                                BOOl=False
+                                                break 
+                                            elif ww[i+a+b] in badset: 
+                                                #print(ww[i:i+a+b+1]) 
+                                                i=i+a+b 
+                                                negperfcnt+=a+b
+                                                endnegperf=False
+                                                BOOl=False
+                                                break 
+                                            
+                                        elif "." in negperfdict[ww[i].lower()]:
+                                            if ww[i+b] in amplifierset:
+                                                negperfcnt+=sum([a,b])
+                                                #print(ww[i:i+b+a+1]) 
+                                                i=i+b+a
+                                                endnegperf=False
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in negatorset:
+                                                posperfcnt+=sum([a,b])
+                                                #print(ww[i:i+b+a+1]) 
+                                                i=i+b+a
+                                                endnegperf=False
+                                                BOOl=False
+                                                break
+                                            if ww[i+b] in badset:
+                                                negperfcnt+=sum([a,b])
+                                                #print(ww[i:i+b+a+1]) 
+                                                i=i+b+a
+                                                endnegperf=False
+                                                BOOl=False
+                                                break                                       
+
+                        i+=1                        
+
+                    if endposperf: 
+                        positiveperformance=0
+                        positiveperformancesent.append(positiveperformance)
+                    else: 
+                        positiveperformance=1 
+                        positiveperformancesent.append(positiveperformance)
+
+                    if endnegperf: 
+                        negativeperformance=0
+                        negativeperformancesent.append(negativeperformance)
+                    else: 
+                        negativeperformance=1 
+                        negativeperformancesent.append(negativeperformance)
+
+
+                    if endext: 
+                        endextstring=""
+                        for i in range(len(ww)-3): 
+                            if ww[i].lower() in externaldict:
+                                for el in externaldict[ww[i]]:
+                                    if el!="": 
+                                        if el.lower()==ww[i+1]: 
+                                            endextstring+=ww[i]+" "
+                                            endextstring+=ww[i+1]+" "
+                                            endext=False
+                                        if el.lower()==ww[i+2]: 
+                                            endextstring+=ww[i]+" "
+                                            endextstring+=ww[i+2]+" "
+                                            endext=False
+                                        if el.lower()==ww[i+3]: 
+                                            endextstring+=ww[i]+" "
+                                            endextstring+=ww[i+3]+" "
+                                            #print(internaldict[ww[i]])
+                                            endext=False
+                                    else: 
+                                        endextstring+=ww[i]
+                                        endext=False
+
+        
+                    if endext:      
+                        external=0
+                        externalsent.append(external)
+
+                    else: 
+                        external=1
+                        externalsent.append(external)
+                    
+                    #
+                    if endint: 
+                        internalstring=""
+                        for i in range(len(ww)-3): 
+                            if ww[i].lower() in internaldict:
+                                a=ww[i].lower()
+                                for el in internaldict[ww[i]]:
+                                    if el!="": 
+                                        if el.lower()==ww[i+1]: 
+                                            internalstring+=ww[i]+" "
+                                            internalstring+=ww[i+1]+" "
+                                            endint=False
+                                        if el.lower()==ww[i+2]: 
+                                            internalstring+=ww[i]+" "
+                                            internalstring+=ww[i+2]+" "
+                                            endint=False
+                                        if el.lower()==ww[i+3]: 
+                                            internalstring+=ww[i]+" "
+                                            internalstring+=ww[i+3]+" "
+                                            #print(externaldict[ww[i]])
+                                            endint=False
+                                    else: 
+                                        internalstring+=ww[i]
+                                        endint=False
+
+
+
+                    if endint:      
+                        internal=0
+                        internalsent.append(internal)
+
+                    else: 
+                        internal=1
+                        internalsent.append(internal)
+                    
+
+
+                
+                Y=True
+                # Debug 14th of May
+                fsent.write(files)
+                sentno=int(sentno)
+                fsent.write(str(sentno))
+                if not endnegperf and internal!=0:
+                    
+                    fsent.write("negative performance, internal \n")
+                    fsent.write(internalstring+"\n")
+                    fsent.write("\n")
+                    fsent.write(sentences + "\n"+ "\n")
+                    
+                elif not endnegperf: # want matching case for sent with only negative performance
+                    fsent.write("negative performance only \n")
+                    fsent.write(sentences + "\n"+ "\n")
+                    Y=False 
+                    
+                if not endnegperf and external!=0 : 
+                    fsent.write("negative performance, external \n")
+                    fsent.write(endextstring+"\n")
+                    fsent.write("\n")
+                    fsent.write(sentences + "\n"+ "\n")
+
+
+                """
+                elif not endnegperf: 
+                    if Y:
+                        fsent.write("negative performance \n")
+                        fsent.write("\n")
+                        fsent.write(sentences + "\n"+ "\n")
+
+                """
+                
+                if not endposperf and internal!=0:
+                    
+                    fsent.write("positive performance, internal \n")
+                    fsent.write(internalstring+"\n")
+                    fsent.write("\n")
+                    fsent.write(sentences + "\n"+ "\n")
+
+
+                """    
+                elif not endposperf: # want matching case for sent with only negative performance
+                    fsent.write("positive performance only \n")
+                    fsent.write(sentences + "\n"+ "\n")
+                    Y=False 
+                    
+                """
+
+                if not endposperf and external!=0 : 
+                    fsent.write("positive performance, external \n")
+                    fsent.write(endextstring+"\n")
+                    fsent.write("\n")
+                    fsent.write(sentences + "\n"+ "\n")
+
+
+                """
+                elif not endposperf: 
+                    if Y:
+                        fsent.write("negative performance \n")
+                        fsent.write("\n")
+                        fsent.write(sentences + "\n"+ "\n")
+
+                """
+
+                    sentlen.append(len(ww))
+
+                else:
+                    sentno-=1
+                    
+            
+
+            r=int(totalnumberofsent)+1
+            sentlist.append(r/2)
+            if DEBUG:
+                if filenum==10:
+                    break 
+
+             
+                        
+            
+    print(filename)  
+    print(len(sentnolist))           
+    print(len(posperflist))    
+    print(len(internalsent))
+    print(len(externalsent))
+    p=zip(filename,sentnolist,positiveperformancesent,negativeperformancesent,internalsent,externalsent)
+    for row in p:
+        #print(row)
+        wr.writerow(row)
+
+    print(len(f1))
+    return sentlist
+
+
+
+
+'''
+
+part 3 will take sentences.csv written by dicpart2 and add together the number of sentences in one file that are in the categories posint,negint,posext,negext
+
+###################################################################################################################
+Data Dependencies:
+
+sentence.csv
+
+###################################################################################################################
+
+Output file: 
+
+vector.csv 
+
+Outputn fields: 
+
+filename,posint,negint,posext,negext
+
+'''
+
+
+#This piece of code will output weights of documents in four categories:posint,negint,posext,negext
+#For each time a sentence of the above type occurs, we count one. 
+
+
+
+
+a=0 
+
+
+posintlist=[]
+negintlist=[]
+posextlist=[]
+negextlist=[]
+
+filenamelist=[]
+yearlist=[]
+ciklist=[]
+#sentlist=[] 
+
+
+
+def finalcount(): 
+    global a 
+    a=0 
+    sentlist=searchwords()
+    print(len(sentlist))
+    f_out2 = open(csv2, 'w')
+    wr2 = csv.writer(f_out2)
+
+    with open(csv1,"r") as csvfile: 
+
+        freader=csv.reader(csvfile)
+        for row in freader:
+            if "none" not in row[0] and "lucy" in row[0]: #matches a component in directory name, please change accordingly
+                #print(row[0])
+                everyfilename=row[0]
+                #
+                y=row[0][row[0].find("-")+1:row[0].find("-")+5]
+                yearlist.append(y)
+                st=""
+                for e in row[0]: 
+                    if e.isalpha() or e=="/": 
+                        continue
+                    elif e !="-": 
+                        st+=e
+                    elif e=="-": 
+                        break
+    
+                cik=st
+                ciklist.append(cik)
+
+                #everyfilename=
+                filenamelist.append(everyfilename)
+                a=a+1
+                
+                if a > 1: #if more than one file has been loaded and the next line is the actual filename 
+                    posintlist.append(posint)
+                    #print(posintlist)
+                    negintlist.append(negint)
+                    posextlist.append(posext)
+                    negextlist.append(negext)
+                    
+                posint=0
+                negint=0
+                posext=0 
+                negext=0
+                    
+            if "1" in row[2] and "1" in row[4]: 
+                posint=posint+1
+            if "1" in row[3] and "1" in row[4]: 
+                negint=negint+1
+            if "1" in row[2] and "1" in row[5]:
+                posext=posext+1 
+            if "1" in row[3] and "1" in row[5]:
+                negext=negext+1
+           
+    
+    print(len(filenamelist))   
+    print(len(yearlist))  
+    print(len(ciklist))     
+    print(len(posintlist)) 
+    print(len(negintlist))    
+    print(len(posextlist))    
+    print(len(negextlist))    
+    print(len(sentlist))     
+
+    p=zip(filenamelist,yearlist,ciklist,posintlist,negintlist,posextlist,negextlist,sentlist) 
+    wr2.writerow(["filename","year","cik","posint","negint","posext","negext","sentlist"])
+    for row in p:
+        wr2.writerow(row)
+
+finalcount()
